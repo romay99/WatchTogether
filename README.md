@@ -53,7 +53,7 @@
   - AWS S3 를 이용해 사용자와 극장의 프로필 사진을 업로드 할 수 있다. 
 
 ## ERD 
-![ERD](doc/img/erd.png)
+![Image](https://github.com/user-attachments/assets/9b885ff3-d2c9-4aa0-8578-c653a4247cdc)
 
 ## Trouble Shooting
 [go to the trouble shooting section](doc/TROUBLE_SHOOTING.md)
