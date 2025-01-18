@@ -49,7 +49,7 @@
 ### API 기능🛠
 - 영화 정보 가져오기 기능
   - <같이 봐요> 및 상영 가능 영화를 조회할 때 TMDB API 를 이용해 영화 정보를 가져온다.  
-    (Resttemplate 이용한 API 호출)
+  **Ref. https://developer.themoviedb.org/reference/intro/getting-started**
 
 - 프로필 사진 업로드 기능
   - AWS S3 를 이용해 사용자와 극장의 프로필 사진을 업로드 할 수 있다. 
