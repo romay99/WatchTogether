@@ -3,6 +3,9 @@
 시간이 지나 극장에서 관람할 기회를 놓쳐버린 영화들,  
 혹은 OTT로 관람했던 영화를 사람들과 함께 극장에서 관람할 수 있게끔 하는 서비스입니다.
 
+## ERD 
+![Image](https://github.com/user-attachments/assets/9b885ff3-d2c9-4aa0-8578-c653a4247cdc)
+
 ## 프로젝트 기능 및 설계
 
 ### 사용자기능 👨‍💼
@@ -61,8 +64,7 @@
 - 프로필 사진 업로드 기능
   - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다. 
 
-## ERD 
-![Image](https://github.com/user-attachments/assets/9b885ff3-d2c9-4aa0-8578-c653a4247cdc)
+
 
 ## Trouble Shooting
 [go to the trouble shooting section](doc/TROUBLE_SHOOTING.md)
