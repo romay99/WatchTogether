@@ -75,7 +75,7 @@
 
 
 ## Trouble Shooting
-[go to the trouble shooting section](doc/TROUBLE_SHOOTING.md)
+https://political-plant-c63.notion.site/183ff19351e7805194f4ec1e54cd0bfb
 
 ### Tech Stack
 ![js]( https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
