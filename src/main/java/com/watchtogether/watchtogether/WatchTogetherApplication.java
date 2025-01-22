@@ -1,4 +1,4 @@
-package com.watch_together.watch_together;
+package com.watchtogether.watchtogether;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
