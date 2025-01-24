@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,4 +44,10 @@ public class Cinema {
 
   @OneToOne
   private Member member;
+
+  // DB 저장될때 날짜/시간 생성
+  @PrePersist
+  private void initTransactionDateTime() {
+    this.registerDate = LocalDate.now();
+  }
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,11 +27,14 @@ public class Member {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long code;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String memberId;
 
   @Column(nullable = false)
   private String password;
+
+  @Column(nullable = false)
+  private String name;
 
   @Column(nullable = false)
   private int point;
@@ -49,5 +53,11 @@ public class Member {
 
   @Column(nullable = false)
   private LocalDate registerDate;
+
+  // DB 에 저장되기전 가입일 설정
+  @PrePersist
+  private void registerDateInit() {
+    this.registerDate = LocalDate.now();
+  }
 
 }
