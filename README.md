@@ -4,7 +4,7 @@
 혹은 OTT로 관람했던 영화를 사람들과 함께 극장에서 관람할 수 있게끔 하는 서비스입니다.
 
 ## ERD 
-![Image](https://github.com/user-attachments/assets/01630fe3-f3e3-4c6d-aad5-0ec81d1ef110)
+![Image](https://github.com/user-attachments/assets/c08a246c-bc9b-4eaa-9b91-35c620ca7fe6)
 
 
 ## 프로젝트 기능 및 설계
@@ -17,6 +17,7 @@
     - 멤버 ID (수정 불가 , 중복 불가)
     - 비밀번호
     - 이메일
+    - 사용자 이름름
     - 전화번호
     - 프로필 사진 (선택)
 
