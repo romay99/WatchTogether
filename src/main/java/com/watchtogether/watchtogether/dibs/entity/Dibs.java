@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +36,10 @@ public class Dibs {
 
   @ManyToOne
   private Member member;
+
+  // DB 저장될때 거래 날짜/시간 생성
+  @PrePersist
+  private void initDibsDateTime() {
+    this.dateTime = LocalDateTime.now();
+  }
 }

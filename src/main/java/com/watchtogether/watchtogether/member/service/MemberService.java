@@ -5,7 +5,6 @@ import com.watchtogether.watchtogether.member.dto.MemberJoinDto;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.entity.Role;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
-import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ public class MemberService {
   public Member joinMember(MemberJoinDto dto) {
 
     // 이미 사용중인 ID 라면 예외 발생
-    if (memberRepository.findByMemberId(dto.getMemberId()).isPresent()) {
+    if (memberRepository.existsByMemberId(dto.getMemberId())) {
       throw new MemberIdAlreadyUseException("이미 사용중인 ID 입니다.");
     }
 
@@ -34,15 +33,8 @@ public class MemberService {
         .name(dto.getName())
         .email(dto.getEmail())
         .tel(dto.getTel())
-        .role(Role.ROLE_USER)
-        // 가입일 초기화
-        .registerDate(LocalDate.now())
+        .role(dto.isPartner() ? Role.ROLE_PARTNER : Role.ROLE_USER)
         .build();
-
-    // 파트너 가입일 땐 파트너 권한을 준다.
-    if (dto.isPartner()) {
-      member.setRole(Role.ROLE_PARTNER);
-    }
 
     return memberRepository.save(member);
   }
