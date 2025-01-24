@@ -33,6 +33,9 @@ public class Member {
   private String password;
 
   @Column(nullable = false)
+  private String name;
+
+  @Column(nullable = false)
   private int point;
 
   private String profilePhotoUrl;
