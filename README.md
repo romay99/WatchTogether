@@ -4,7 +4,7 @@
 혹은 OTT로 관람했던 영화를 사람들과 함께 극장에서 관람할 수 있게끔 하는 서비스입니다.
 
 ## ERD 
-![Image](https://github.com/user-attachments/assets/a6e8bcfb-1ecd-49b9-aca0-4b2c02231581)
+![Image](https://github.com/user-attachments/assets/01630fe3-f3e3-4c6d-aad5-0ec81d1ef110)
 
 
 ## 프로젝트 기능 및 설계
@@ -29,7 +29,7 @@
 
 - 포인트 기능
   - 사용자는 계정에 포인트를 보유하고 있다.
-  - 사용자는 포인트를 충전할 수 있다.
+  - 사용자는 포인트를 충전할 수 있다. (카카오페이 API 이용)
   - 이 포인트는 <같이 봐요> 생성 및 신청에 사용된다.
   - PARTNER 계정은 포인트 충전이 불가능하다.
 ***
@@ -66,13 +66,16 @@
   - <같이 봐요> 및 상영 가능 영화를 조회할 때 TMDB API 를 이용해 영화 정보를 가져온뒤, DB에 저장한다.  
   **Ref. https://developer.themoviedb.org/reference/intro/getting-started**
 
+- 포인트 충전 기능
+  - 카카오페이 API 를 이용하여 사용자는 계정에 포인트를 충전할 수 있다.   
+
 - 프로필 사진 업로드 기능
   - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다. 
 
 
 
 ## Trouble Shooting
-[go to the trouble shooting section](doc/TROUBLE_SHOOTING.md)
+https://political-plant-c63.notion.site/183ff19351e7805194f4ec1e54cd0bfb
 
 ### Tech Stack
 ![js]( https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
@@ -83,3 +86,5 @@
 <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
 <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
+![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
+
