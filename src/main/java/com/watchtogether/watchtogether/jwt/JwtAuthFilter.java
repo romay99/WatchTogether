@@ -22,11 +22,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String authorizationHeader = request.getHeader("Authorization");
 
     //JWT 가 null 이 아니고 , 'Bearer ' 로 시작하는 경우
-    if (checkToken(authorizationHeader)) {
-      String token = authorizationHeader.substring(7);
+    if (checkToken(request.getHeader("Authorization"))) {
+      String token = request.getHeader("Authorization").substring(7);
 
       //JWT 유효성 검증
       if (jwtUtil.validateToken(token)) {
