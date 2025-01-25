@@ -41,7 +41,7 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
-                    "/member/join").permitAll()
+                    "/member/join", "/movie/list").permitAll()
                 .anyRequest().authenticated());
 
     return http.build();
