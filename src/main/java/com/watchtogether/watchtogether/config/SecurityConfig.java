@@ -1,7 +1,7 @@
 package com.watchtogether.watchtogether.config;
 
 import com.watchtogether.watchtogether.jwt.JwtAuthFilter;
-import com.watchtogether.watchtogether.jwt.JwtUtil;
+import com.watchtogether.watchtogether.jwt.JwtProvider;
 import com.watchtogether.watchtogether.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  private final JwtUtil jwtUtil;
+  private final JwtProvider jwtProvider;
   private final CustomUserDetailsService customUserDetailsService;
 
   /*
@@ -53,7 +53,7 @@ public class SecurityConfig {
 
     // JWT 필터 추가
     http
-        .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtUtil),
+        .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtProvider),
             UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

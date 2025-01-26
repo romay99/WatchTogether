@@ -1,6 +1,5 @@
 package com.watchtogether.watchtogether.jwt;
 
-import com.watchtogether.watchtogether.member.dto.MemberDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,34 +13,35 @@ import java.time.ZonedDateTime;
 
 @Component
 @Slf4j
-public class JwtUtil {
+public class JwtProvider {
 
   private final Key key;
   private final long accessTokenExpTime;
 
   // 생성자로 DI
-  public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expTime}") long expTime) {
+  public JwtProvider(@Value("${jwt.secret}") String secretKey,
+      @Value("${jwt.expTime}") long expTime) {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     this.key = Keys.hmacShaKeyFor(keyBytes);
     this.accessTokenExpTime = expTime;
   }
 
-  public String createAccessToken(MemberDto memberDto) {
-    return createToken(memberDto, accessTokenExpTime);
+  public String createAccessToken(String memberId) {
+    return createToken(memberId, accessTokenExpTime);
   }
 
   /**
    * 토큰 생성하는 메서드
    *
-   * @param memberDto          멤버 정보를 담은 DTO
+   * @param memberId           사용자 ID
    * @param accessTokenExpTime 토큰 만료 시간
    * @return JWT 를 return
    */
-  private String createToken(MemberDto memberDto, long accessTokenExpTime) {
+  private String createToken(String memberId, long accessTokenExpTime) {
     Claims claims = Jwts.claims();
 
     // ID 를 JWT 의 Claim 에 넣는다.
-    claims.put("memberId", memberDto.getMemberId());
+    claims.put("memberId", memberId);
 
     // 현재 시간과 만료 시간을 설정
     ZonedDateTime now = ZonedDateTime.now();
@@ -73,13 +73,13 @@ public class JwtUtil {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
       return true;
     } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-      log.info("Invalid JWT Token", e);
+      log.warn("Invalid JWT Token", e);
     } catch (ExpiredJwtException e) {
-      log.info("Expired JWT Token", e);
+      log.warn("Expired JWT Token", e);
     } catch (UnsupportedJwtException e) {
-      log.info("Unsupported JWT Token", e);
+      log.warn("Unsupported JWT Token", e);
     } catch (IllegalArgumentException e) {
-      log.info("JWT claims string is empty.", e);
+      log.warn("JWT claims string is empty.", e);
     }
     return false;
   }

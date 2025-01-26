@@ -35,7 +35,7 @@ public class MemberController {
    */
   @PostMapping("/login")
   public ResponseEntity<String> memberLogin(@RequestBody MemberLoginDto dto) {
-    String token = memberService.longinMember(dto);
+    String token = memberService.loginMember(dto);
     return ResponseEntity.ok().body(token);
   }
 }

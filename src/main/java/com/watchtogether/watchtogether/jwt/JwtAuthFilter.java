@@ -17,7 +17,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final CustomUserDetailsService customUserDetailsService;
-  private final JwtUtil jwtUtil;
+  private final JwtProvider jwtProvider;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -28,8 +28,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       String token = request.getHeader("Authorization").substring(7);
 
       //JWT 유효성 검증
-      if (jwtUtil.validateToken(token)) {
-        String userId = jwtUtil.getUserId(token);
+      if (jwtProvider.validateToken(token)) {
+        String userId = jwtProvider.getUserId(token);
 
         //유저와 토큰 일치 시 userDetails 생성
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);

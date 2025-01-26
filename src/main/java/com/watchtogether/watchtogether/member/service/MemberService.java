@@ -3,8 +3,7 @@ package com.watchtogether.watchtogether.member.service;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
-import com.watchtogether.watchtogether.jwt.JwtUtil;
-import com.watchtogether.watchtogether.member.dto.MemberDto;
+import com.watchtogether.watchtogether.jwt.JwtProvider;
 import com.watchtogether.watchtogether.member.dto.MemberJoinDto;
 import com.watchtogether.watchtogether.member.dto.MemberLoginDto;
 import com.watchtogether.watchtogether.member.entity.Member;
@@ -20,7 +19,7 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
-  private final JwtUtil jwtUtil;
+  private final JwtProvider jwtProvider;
 
   /**
    * 회원가입 하는 메서드
@@ -57,7 +56,7 @@ public class MemberService {
    * @param dto 회원의 ID 와 비밀번호를 담은 DTO
    * @return 정상적으로 로그인 성공시 JWT 응답
    */
-  public String longinMember(MemberLoginDto dto) {
+  public String loginMember(MemberLoginDto dto) {
     // ID 값으로 멤버를 찾는다. 존재하지 않는다면 예외 발생
     Member member = memberRepository.findByMemberId(dto.getUsername()).orElseThrow(
         () -> new MemberNotFoundException("존재하지 않는 회원정보 입니다.")
@@ -69,11 +68,6 @@ public class MemberService {
     }
 
     // 토큰 생성
-    return jwtUtil.createAccessToken(
-        MemberDto.builder()
-            .memberId(member.getMemberId())
-            .role(member.getRole())
-            .build()
-    );
+    return jwtProvider.createAccessToken(member.getMemberId());
   }
 }
