@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,6 @@ public class MovieService {
    *
    * @param movieId 영화 ID 값
    */
-  @Transactional
   public Movie getMovieDetail(Long movieId) {
     return movieRepository.findById(movieId)
         .orElseGet(() -> movieRepository.save(tmdbApiService.findMovieById(movieId)));

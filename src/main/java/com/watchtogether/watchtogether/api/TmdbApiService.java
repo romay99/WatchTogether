@@ -3,6 +3,7 @@ package com.watchtogether.watchtogether.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -74,11 +77,19 @@ public class TmdbApiService {
 
     log.info("GET : " + uri);
 
-    ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, entity,
-        String.class);
+    ResponseEntity<String> response = null;
+    // TMDB 의 response status 가 404 면 예외 발생
+    try {
+      response = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+    } catch (HttpClientErrorException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+        throw new MovieDataNotFoundException("영화 정보가 존재하지 않습니다.");
+      }
+    }
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new JavaTimeModule());
+
     // 받아온 String 형식의 데이터를 Movie entity 로 변환
     Movie movie = null;
     try {
@@ -88,7 +99,6 @@ public class TmdbApiService {
     }
 
     log.info(movie.getTitle() + " 데이터 가져오기 완료");
-
     return movie;
   }
 }
