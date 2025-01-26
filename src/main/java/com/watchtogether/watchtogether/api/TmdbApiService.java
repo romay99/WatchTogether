@@ -2,6 +2,7 @@ package com.watchtogether.watchtogether.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,7 @@ public class TmdbApiService {
         String.class);
 
     ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
     // 받아온 String 형식의 데이터를 Movie entity 로 변환
     Movie movie = null;
     try {
