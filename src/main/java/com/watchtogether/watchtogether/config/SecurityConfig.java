@@ -48,6 +48,7 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
+                    "/member/join", "/movie/list", "/movie/detail/**",
                     "/member/join", "/member/login").permitAll()
                 .anyRequest().authenticated());
 

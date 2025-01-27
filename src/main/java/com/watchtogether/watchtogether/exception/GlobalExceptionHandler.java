@@ -1,6 +1,7 @@
 package com.watchtogether.watchtogether.exception;
 
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
+import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,16 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(MemberIdAlreadyUseException.class)
   public ResponseEntity<ErrorResponse> handleIdAlreadyUsedException(MemberIdAlreadyUseException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 영화 데이터가 존재하지 않을때 예외 처리
+   */
+  @ExceptionHandler(MovieDataNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleMovieDataNotFoundException(
+      MovieDataNotFoundException e) {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
