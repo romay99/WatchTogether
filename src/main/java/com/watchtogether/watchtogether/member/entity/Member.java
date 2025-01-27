@@ -59,5 +59,4 @@ public class Member {
   private void registerDateInit() {
     this.registerDate = LocalDate.now();
   }
-
 }
