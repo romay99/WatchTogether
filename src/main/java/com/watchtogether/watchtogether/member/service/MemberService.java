@@ -1,25 +1,33 @@
 package com.watchtogether.watchtogether.member.service;
 
+import com.watchtogether.watchtogether.cinema.entity.Cinema;
+import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
 import com.watchtogether.watchtogether.jwt.JwtProvider;
 import com.watchtogether.watchtogether.member.dto.MemberJoinDto;
 import com.watchtogether.watchtogether.member.dto.MemberLoginDto;
+import com.watchtogether.watchtogether.member.dto.MemberUpdateDto;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.entity.Role;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtProvider jwtProvider;
+  private final CinemaRepository cinemaRepository;
 
   /**
    * 회원가입 하는 메서드
@@ -69,5 +77,59 @@ public class MemberService {
 
     // 토큰 생성
     return jwtProvider.createAccessToken(member.getMemberId());
+  }
+
+  /**
+   * 유저 정보 업데이트하는 메서드
+   *
+   * @param dto      업데이트할 정보를 담은 DTO
+   * @param memberId 메서드를 호출한 멤버의 ID
+   */
+  public void updateMember(MemberUpdateDto dto, String memberId) {
+    // 사용자가 존재 하지 않으면 예외 발생
+    Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+        () -> new MemberNotFoundException("존재하지 않는 회원정보 입니다.")
+    );
+
+    if (dto.getPassword() != null) {
+      member.setPassword(passwordEncoder.encode(dto.getPassword()));
+    }
+    if (dto.getEmail() != null) {
+      member.setEmail(dto.getEmail());
+    }
+    if (dto.getName() != null) {
+      member.setName(dto.getName());
+    }
+    if (dto.getTel() != null) {
+      member.setTel(dto.getTel());
+    }
+
+    memberRepository.save(member);
+  }
+
+
+  /**
+   * 사용자 정보 삭제하는 메서드
+   *
+   * @param memberId 삭제할 사용자의 ID
+   */
+  @Transactional
+  public void deleteMember(String memberId) {
+    // 사용자가 존재 하지 않으면 예외 발생
+    Member member = memberRepository.findByMemberId(memberId).orElseThrow(
+        () -> new MemberNotFoundException("존재하지 않는 회원정보 입니다.")
+    );
+
+    /*
+    파트너 계정일 경우 계정에 연동되어 있는 극장정보가 있는지 확인,
+    존재한다면 극장 데이터도 삭제한다.
+     */
+    if ("ROLE_PARTNER".equals(member.getRole().toString())) {
+      Optional<Cinema> cinema = cinemaRepository.findByMemberMemberId(memberId);
+      if (cinema.isPresent()) {
+        cinemaRepository.delete(cinema.get());
+      }
+    }
+    memberRepository.delete(member);
   }
 }

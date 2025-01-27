@@ -1,5 +1,6 @@
-package com.watchtogether.watchtogether.member.entity;
+package com.watchtogether.watchtogether.member.security;
 
+import com.watchtogether.watchtogether.member.entity.Role;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Setter
 @Builder
 public class CustomUserDetail implements UserDetails {
+
   private String memberId;
   private Role role;
   private String password;

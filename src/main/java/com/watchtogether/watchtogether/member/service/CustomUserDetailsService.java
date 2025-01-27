@@ -1,7 +1,7 @@
 package com.watchtogether.watchtogether.member.service;
 
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
-import com.watchtogether.watchtogether.member.entity.CustomUserDetail;
+import com.watchtogether.watchtogether.member.security.CustomUserDetail;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
