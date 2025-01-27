@@ -1,5 +1,8 @@
 package com.watchtogether.watchtogether.config;
 
+import com.watchtogether.watchtogether.jwt.JwtAuthFilter;
+import com.watchtogether.watchtogether.jwt.JwtProvider;
+import com.watchtogether.watchtogether.member.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +13,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
+
+  private final JwtProvider jwtProvider;
+  private final CustomUserDetailsService customUserDetailsService;
 
   /*
    * 패스워드 인코더 Bean 생성
@@ -41,8 +48,14 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
-                    "/member/join", "/movie/list", "/movie/detail/**").permitAll()
+                    "/member/join", "/movie/list", "/movie/detail/**",
+                    "/member/join", "/member/login").permitAll()
                 .anyRequest().authenticated());
+
+    // JWT 필터 추가
+    http
+        .addFilterBefore(new JwtAuthFilter(customUserDetailsService, jwtProvider),
+            UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
