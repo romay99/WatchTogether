@@ -1,6 +1,5 @@
 package com.watchtogether.watchtogether.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
@@ -25,6 +24,7 @@ public class TmdbApiService {
 
   private final String API_KEY;
   private final String rootUri = "https://api.themoviedb.org/3";
+  private final String posterBaseUri = "https://image.tmdb.org/t/p/original";
   private final RestTemplate restTemplate;
 
   // API KEY 를 application.properties 에서 가져온다.
@@ -94,11 +94,13 @@ public class TmdbApiService {
     Movie movie = null;
     try {
       movie = mapper.readValue(response.getBody(), Movie.class);
-    } catch (JsonProcessingException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
     log.info(movie.getTitle() + " 데이터 가져오기 완료");
+    // 포스터 baseUri 추가
+    movie.setPosterUrl(posterBaseUri + movie.getPosterUrl());
     return movie;
   }
 }
