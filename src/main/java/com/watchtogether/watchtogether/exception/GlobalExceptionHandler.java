@@ -49,4 +49,10 @@ public class GlobalExceptionHandler {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }
