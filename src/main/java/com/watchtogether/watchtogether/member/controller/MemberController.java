@@ -50,7 +50,7 @@ public class MemberController {
    *
    * @param dto 수정할 회원정보가 담긴 DTO
    */
-  @PutMapping("/update")
+  @PutMapping("/member")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PARTNER')")
   public ResponseEntity<String> updateMember(@RequestBody MemberUpdateDto dto) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
@@ -62,7 +62,7 @@ public class MemberController {
   /**
    * 회원 탈퇴하는 메서드
    */
-  @DeleteMapping("/delete")
+  @DeleteMapping("/member")
   @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_PARTNER')")
   public ResponseEntity<String> deleteMember() {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.

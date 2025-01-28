@@ -10,4 +10,6 @@ public interface CinemaRepository extends JpaRepository<Cinema, Long> {
 
   Optional<Cinema> findByMemberMemberId(String memberId);
 
+  void deleteByMemberMemberId(String memberId);
+
 }

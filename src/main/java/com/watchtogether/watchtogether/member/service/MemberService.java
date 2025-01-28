@@ -1,6 +1,5 @@
 package com.watchtogether.watchtogether.member.service;
 
-import com.watchtogether.watchtogether.cinema.entity.Cinema;
 import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
@@ -12,7 +11,6 @@ import com.watchtogether.watchtogether.member.dto.MemberUpdateDto;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.entity.Role;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -125,10 +123,7 @@ public class MemberService {
     존재한다면 극장 데이터도 삭제한다.
      */
     if ("ROLE_PARTNER".equals(member.getRole().toString())) {
-      Optional<Cinema> cinema = cinemaRepository.findByMemberMemberId(memberId);
-      if (cinema.isPresent()) {
-        cinemaRepository.delete(cinema.get());
-      }
+      cinemaRepository.deleteByMemberMemberId(memberId);
     }
     memberRepository.delete(member);
   }
