@@ -2,7 +2,6 @@ package com.watchtogether.watchtogether.movie.contoller;
 
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.service.MovieService;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +31,6 @@ public class MovieController {
    * TmdbApiService 에서 가져온 영화 데이터를 저장한다.
    *
    * @param movieId 영화 ID 값
-   * @throws IOException 유효하지 않은 영화 ID 값이 들어올경우 예외 발생
    */
   @GetMapping("/detail")
   public ResponseEntity<Movie> getMovieDetail(@RequestParam Long movieId) {
