@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import java.time.LocalDate;
@@ -32,6 +33,7 @@ public class Cinema {
   private String name;
 
   @Column(nullable = false)
+  @Lob
   private String description;
 
   @Column(nullable = false)

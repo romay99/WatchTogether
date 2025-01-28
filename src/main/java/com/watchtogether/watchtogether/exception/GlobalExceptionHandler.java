@@ -1,9 +1,11 @@
 package com.watchtogether.watchtogether.exception;
 
+import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
 import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
+import com.watchtogether.watchtogether.exception.custom.PartnerCanHaveOneCinemaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -46,6 +48,26 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MemberPasswordNotMatchException.class)
   public ResponseEntity<ErrorResponse> handleMemberPasswordNotMatchException(
       MemberPasswordNotMatchException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 하나의 파트너계정에 여러개의 극장을 등록하려할때 예외처리
+   */
+  @ExceptionHandler(PartnerCanHaveOneCinemaException.class)
+  public ResponseEntity<ErrorResponse> handlePartnerCanHaveOneCinemaException(
+      PartnerCanHaveOneCinemaException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 극장 정보가 존재하지 않을때 예외처리
+   */
+  @ExceptionHandler(CinemaNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleCinemaNotFoundException(
+      CinemaNotFoundException e) {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
