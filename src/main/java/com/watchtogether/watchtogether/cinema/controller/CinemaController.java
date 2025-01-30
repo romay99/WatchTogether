@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.watchtogether.watchtogether.cinema.entity.Cinema;
 
@@ -59,5 +61,15 @@ public class CinemaController {
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
     Cinema cinema = cinemaService.modifyCinema(dto, memberId);
     return ResponseEntity.ok().body(cinema);
+  }
+
+  /**
+   * 극장 정보를 조회하는 메서드
+   * @param cinemaId 조회할 극장의 ID
+   * @return 극장의 정보를 담은 DTO
+   */
+  @GetMapping("/info")
+  public ResponseEntity<CinemaDto> getCinema(@RequestParam Long cinemaId) {
+    return ResponseEntity.ok(cinemaService.getCinemaInfoById(cinemaId));
   }
 }

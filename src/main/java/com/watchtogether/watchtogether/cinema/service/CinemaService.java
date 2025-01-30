@@ -65,6 +65,7 @@ public class CinemaService {
    *
    * @param memberId 삭제하려는 사용자의 ID
    */
+  @Transactional
   public void deleteCinema(String memberId) {
     cinemaRepository.deleteByMemberMemberId(memberId);
     log.info("{} 님의 계정에 연동된 극장 정보가 삭제되었습니다.", memberId);
@@ -108,5 +109,17 @@ public class CinemaService {
     // 수정된 entity 저장
     log.info("{} 님의 계정에 연동된 극장의 정보가 수정되었습니다.", memberId);
     return cinemaRepository.save(cinema);
+  }
+
+  /**
+   * 극장 정보 조회하는 메서드
+   * @param cinemaId 정보를 조회할 극장 ID
+   * @return 극장 정보를 담은 DTO
+   */
+  public CinemaDto getCinemaInfoById(Long cinemaId) {
+    Cinema cinema = cinemaRepository.findById(cinemaId)
+        .orElseThrow(() -> new CinemaNotFoundException("존재하지 않는 극장 정보입니다."));
+
+    return CinemaDto.toDto(cinema);
   }
 }
