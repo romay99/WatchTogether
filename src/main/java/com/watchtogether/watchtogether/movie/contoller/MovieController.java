@@ -1,5 +1,6 @@
 package com.watchtogether.watchtogether.movie.contoller;
 
+import com.watchtogether.watchtogether.movie.dto.MovieListPageDto;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,13 +23,15 @@ public class MovieController {
   /**
    * 영화 제목을 통해 영화들을 검색
    *
+   * @param page  페이지 번호
    * @param title 영화 제목
-   * @return 영화 데이터들의 List
    */
-  @GetMapping("/list")
-  @Operation(summary = "영화 제목검색", description = "영화 제목으로 영화 데이터들을 검색합니다.")
-  public ResponseEntity<String> getMovieListFromApi(@RequestParam String title) {
-    return movieService.getMovieListFromApi(title);
+  @GetMapping("/list/title")
+  @Operation(summary = "영화 리스트 검색(제목)", description = "영화 제목으로 영화 데이터들을 검색합니다.")
+  public ResponseEntity<String> getMovieListFromApi(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam String title) {
+    return movieService.getMovieListFromApi(page, title);
   }
 
   /**
@@ -41,5 +44,22 @@ public class MovieController {
   @GetMapping("/detail")
   public ResponseEntity<Movie> getMovieDetail(@RequestParam Long movieId) {
     return ResponseEntity.ok(movieService.getMovieDetail(movieId));
+  }
+
+  /**
+   * 영화 리스트 가져오는 메서드
+   *
+   * @param page 페이지 번호
+   * @param size 페이지 사이즈
+   * @param able true / false 상영 가능 여부
+   */
+  @GetMapping("/list/screen")
+  @Operation(summary = "영화 리스트 검색(상영 가능 여부)", description = "영화의 상영 가능 여부로 영화들을 조회합니다.")
+  public ResponseEntity<MovieListPageDto> getMovieListByScreenAble(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam boolean able) {
+    MovieListPageDto dto = movieService.getMovieListByScreenAble(page, size, able);
+    return ResponseEntity.ok(dto);
   }
 }

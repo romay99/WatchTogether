@@ -39,11 +39,12 @@ public class TmdbApiService {
    * @param title 영화제목
    * @return 영화들의 List 리턴
    */
-  public ResponseEntity<String> getMovieList(String title) {
+  public ResponseEntity<String> getMovieList(int page,String title) {
     // API 요청을 위한 URI 생성
     URI uri = UriComponentsBuilder.fromUriString(rootUri)
         .path("/search/movie")
         .queryParam("query", title)
+        .queryParam("page",page)
         .queryParam("include_adult", "true")
         .queryParam("language", "ko-KR")
         .encode().build().toUri();
