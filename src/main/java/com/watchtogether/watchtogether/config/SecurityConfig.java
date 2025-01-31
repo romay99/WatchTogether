@@ -48,8 +48,11 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
+                    "/","/swagger-ui/**", "/v3/api-docs/**","/v3/api-docs").permitAll()
+                .requestMatchers(
                     "/member/join", "/movie/list", "/movie/detail/**",
-                    "/member/join", "/member/login").permitAll()
+                    "/member/join", "/member/login", "/cinema/info").permitAll()
+
                 .anyRequest().authenticated());
 
     // JWT 필터 추가

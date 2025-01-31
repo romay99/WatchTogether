@@ -12,4 +12,6 @@ public interface CinemaRepository extends JpaRepository<Cinema, Long> {
 
   void deleteByMemberMemberId(String memberId);
 
+  boolean existsByMemberMemberId(String memberId);
+
 }
