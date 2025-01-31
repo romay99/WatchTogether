@@ -52,7 +52,7 @@ public class SecurityConfig {
                     "/member/join", "/member/login", "/docs/**",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui").permitAll()
+                    "/swagger-ui", "/cinema/info").permitAll()
                 .anyRequest().authenticated());
 
     // JWT 필터 추가
