@@ -49,7 +49,7 @@ public class SecurityConfig {
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
                     "/member/join", "/movie/list", "/movie/detail/**",
-                    "/member/join", "/member/login").permitAll()
+                    "/member/join", "/member/login","/cinema/info").permitAll()
                 .anyRequest().authenticated());
 
     // JWT 필터 추가

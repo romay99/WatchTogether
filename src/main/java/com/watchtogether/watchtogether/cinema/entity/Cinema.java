@@ -1,11 +1,13 @@
 package com.watchtogether.watchtogether.cinema.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.watchtogether.watchtogether.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import java.time.LocalDate;
@@ -32,9 +34,11 @@ public class Cinema {
   private String name;
 
   @Column(nullable = false)
+  @Lob
   private String description;
 
   @Column(nullable = false)
+  @JsonIgnore
   private Point coordinates;
 
   @Column(nullable = false)
