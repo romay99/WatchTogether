@@ -5,6 +5,7 @@ import com.watchtogether.watchtogether.member.dto.MemberLoginDto;
 import com.watchtogether.watchtogether.member.dto.MemberUpdateDto;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.service.MemberService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 @Slf4j
+@Tag(name = "사용자",description = "사용자 관련 API 입니다.")
 public class MemberController {
 
   private final MemberService memberService;
