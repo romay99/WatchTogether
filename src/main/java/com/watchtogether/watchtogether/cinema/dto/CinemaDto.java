@@ -19,8 +19,8 @@ public class CinemaDto {
     return CinemaDto.builder()
         .name(cinema.getName())
         .description(cinema.getDescription())
-        .longitude(cinema.getLongitude())
-        .latitude(cinema.getLatitude())
+        .longitude(cinema.getCoordinates().getX())
+        .latitude(cinema.getCoordinates().getY())
         .build();
   }
 }

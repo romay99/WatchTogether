@@ -34,7 +34,11 @@ public class CinemaService {
    * @return 등록된 극장의 정보
    */
   @Transactional
-  public Cinema registerCinema(CinemaDto dto, String memberId) {
+  public CinemaDto registerCinema(CinemaDto dto, String memberId) {
+
+    // 메서드를 호출한 사용자의 ID 로 사용자 데이터를 가져온다.
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
 
     // 이 사용자의 계정으로 등록된 극장이 이미 존재한다면 예외 발생
     if (cinemaRepository.existsByMemberMemberId(memberId)) {
@@ -45,10 +49,6 @@ public class CinemaService {
     Point point = geometryFactory.createPoint(
         new Coordinate(dto.getLongitude(), dto.getLatitude()));
 
-    // 메서드를 호출한 사용자의 ID 로 사용자 데이터를 가져온다.
-    Member member = memberRepository.findByMemberId(memberId)
-        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
-
     // 극장 데이터를 저장
     Cinema cinema = cinemaRepository.save(Cinema.builder().name(dto.getName())
         .description(dto.getDescription())
@@ -57,7 +57,7 @@ public class CinemaService {
         .build());
 
     log.info("{} 극장이 등록 완료되었습니다.", dto.getName());
-    return cinema;
+    return CinemaDto.toDto(cinema);
   }
 
   /**
@@ -77,7 +77,7 @@ public class CinemaService {
    * @param dto      수정할 극장 정보를 담은 DTO
    * @param memberId 수정할 극장에 연동된 사용자의 ID
    */
-  public Cinema modifyCinema(CinemaDto dto, String memberId) {
+  public CinemaDto modifyCinema(CinemaDto dto, String memberId) {
     // 극장 정보가 존재하지 않으면 예외 발생
     Cinema cinema = cinemaRepository.findByMemberMemberId(memberId).orElseThrow(() ->
         new CinemaNotFoundException("극장 정보가 존재하지 않습니다."));
@@ -106,13 +106,17 @@ public class CinemaService {
 
       cinema.setCoordinates(point);
     }
+
     // 수정된 entity 저장
+    Cinema savedCinema = cinemaRepository.save(cinema);
     log.info("{} 님의 계정에 연동된 극장의 정보가 수정되었습니다.", memberId);
-    return cinemaRepository.save(cinema);
+    //DTO 로 변환후 반환
+    return CinemaDto.toDto(savedCinema);
   }
 
   /**
    * 극장 정보 조회하는 메서드
+   *
    * @param cinemaId 정보를 조회할 극장 ID
    * @return 극장 정보를 담은 DTO
    */

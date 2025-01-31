@@ -1,7 +1,6 @@
 package com.watchtogether.watchtogether.cinema.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.watchtogether.watchtogether.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,16 +48,6 @@ public class Cinema {
 
   @OneToOne
   private Member member;
-
-  @JsonProperty("위도")
-  public double getLongitude(){
-    return this.coordinates.getX();
-  }
-
-  @JsonProperty("경도")
-  public double getLatitude(){
-    return this.coordinates.getY();
-  }
 
   // DB 저장될때 날짜/시간 생성
   @PrePersist

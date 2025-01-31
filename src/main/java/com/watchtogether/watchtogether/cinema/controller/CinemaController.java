@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.watchtogether.watchtogether.cinema.entity.Cinema;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +28,11 @@ public class CinemaController {
    * @param dto 입력받은 극장의 정보를 담은 DTO
    */
   @PreAuthorize("hasRole('ROLE_PARTNER')") // 파트너 계정만 접근가능
-  @PostMapping("/cinema")
-  public ResponseEntity<Cinema> registerCinema(@RequestBody CinemaDto dto) {
+  @PostMapping()
+  public ResponseEntity<CinemaDto> registerCinema(@RequestBody CinemaDto dto) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-    Cinema cinema = cinemaService.registerCinema(dto, memberId);
+    CinemaDto cinema = cinemaService.registerCinema(dto, memberId);
     return ResponseEntity.ok().body(cinema);
   }
 
@@ -41,7 +40,7 @@ public class CinemaController {
    * 극장 정보 삭제하는 메서드
    */
   @PreAuthorize("hasRole('ROLE_PARTNER')") // 파트너 계정만 접근가능
-  @DeleteMapping("/cinema")
+  @DeleteMapping()
   public ResponseEntity<?> deleteCinema() {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -55,11 +54,11 @@ public class CinemaController {
    * @param dto 극장의 수정할 정보를 담은 DTO
    */
   @PreAuthorize("hasRole('ROLE_PARTNER')") // 파트너 계정만 접근가능
-  @PutMapping("/cinema")
-  public ResponseEntity<Cinema> modifyCinema(@RequestBody CinemaDto dto) {
+  @PutMapping()
+  public ResponseEntity<CinemaDto> modifyCinema(@RequestBody CinemaDto dto) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-    Cinema cinema = cinemaService.modifyCinema(dto, memberId);
+    CinemaDto cinema = cinemaService.modifyCinema(dto, memberId);
     return ResponseEntity.ok().body(cinema);
   }
 
