@@ -26,7 +26,7 @@ public class MovieController {
    * @param page  페이지 번호
    * @param title 영화 제목
    */
-  @GetMapping("/list/title")
+  @GetMapping("/list")
   @Operation(summary = "영화 리스트 검색(제목)", description = "영화 제목으로 영화 데이터들을 검색합니다.")
   public ResponseEntity<String> getMovieListFromApi(
       @RequestParam(defaultValue = "1") int page,
