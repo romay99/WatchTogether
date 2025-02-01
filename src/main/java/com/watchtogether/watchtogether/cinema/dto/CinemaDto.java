@@ -15,7 +15,7 @@ public class CinemaDto {
   private Double longitude;
   private Double latitude;
 
-  static public CinemaDto toDto(Cinema cinema) {
+  public static CinemaDto toDto(Cinema cinema) {
     return CinemaDto.builder()
         .name(cinema.getName())
         .description(cinema.getDescription())

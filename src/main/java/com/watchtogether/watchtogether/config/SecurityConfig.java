@@ -50,8 +50,8 @@ public class SecurityConfig {
             request.requestMatchers(
                     "/","/swagger-ui/**", "/v3/api-docs/**","/v3/api-docs").permitAll()
                 .requestMatchers(
-                    "/member/join", "/movie/list", "/movie/detail/**",
-                    "/member/join", "/member/login", "/cinema/info").permitAll()
+                    "/member/join", "/movie/list/screen", "/movie/detail/**",
+                    "/member/join", "/member/login", "/cinema/info","/movie/list").permitAll()
 
                 .anyRequest().authenticated());
 
