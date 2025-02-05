@@ -1,7 +1,10 @@
 package com.watchtogether.watchtogether.exception;
 
+import com.watchtogether.watchtogether.exception.custom.AlreadyDibsException;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
+import com.watchtogether.watchtogether.exception.custom.DibsNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
+import com.watchtogether.watchtogether.exception.custom.MovieAlreadyScreenAbleException;
 import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
@@ -68,6 +71,36 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(CinemaNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleCinemaNotFoundException(
       CinemaNotFoundException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 상영 가능한 영화를 찜목록에 추가하려할때 예외처리
+   */
+  @ExceptionHandler(MovieAlreadyScreenAbleException.class)
+  public ResponseEntity<ErrorResponse> handleMovieAlreadyScreenAbleException(
+      MovieAlreadyScreenAbleException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 이미 찜한 영화를 또 찜하려할때 예외처리
+   */
+  @ExceptionHandler(AlreadyDibsException.class)
+  public ResponseEntity<ErrorResponse> handleAlreadyDibsException(
+      AlreadyDibsException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 찜 목록이 존재하지 않을때 예외처리
+   */
+  @ExceptionHandler(DibsNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleDibsNotFoundException(
+      DibsNotFoundException e) {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
