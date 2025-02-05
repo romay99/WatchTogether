@@ -4,8 +4,6 @@ import com.watchtogether.watchtogether.dibs.dto.DibsResponseDto;
 import com.watchtogether.watchtogether.dibs.service.DibsService;
 import com.watchtogether.watchtogether.movie.dto.MovieListPageDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +49,14 @@ public class DibsController {
 
   @DeleteMapping()
   @PreAuthorize("hasRole('ROLE_USER')")
-  @Operation(summary = "찜 삭제하기", description = "찜 목록에서 영화를 삭제합니다",
-      responses = {
-          @ApiResponse(responseCode = "200", content = @Content(mediaType = "text/plain;charset=UTF-8"))})
+  @Operation(summary = "찜 삭제하기", description = "찜 목록에서 영화를 삭제합니다")
   public ResponseEntity<String> deleteMemberDibs(@RequestParam Long movieId) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
-    boolean result = dibsService.deleteMemberDibs(memberId, movieId);
+    int result = dibsService.deleteMemberDibs(memberId, movieId);
 
-    return ResponseEntity.ok(result ? "정상적으로 삭제되었습니다" : "삭제가 실패하였습니다.");
+    return result > 0 ?
+        ResponseEntity.ok("찜 데이터가 정상적으로 삭제되었습니다.") :
+        ResponseEntity.badRequest().body("삭제가 실패하였습니다.");
   }
 }
