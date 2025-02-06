@@ -76,7 +76,7 @@ public class MeetingService {
       throw new MeetingAlreadyExistException("해당 시간 이미 같이볼래요 가 존재합니다.");
     }
     // 포인트 사용기록 저장
-    transactionHistoryService.usePoint(member, 15000, TransactionDetail.WATCH_MEETING);
+    transactionHistoryService.usePoint(member, -15000, TransactionDetail.WATCH_MEETING);
     // 같이볼까요 생성 -> 저장
     WatchMeeting watchMeeting = WatchMeeting.builder()
         .maxPeople(cinema.getMaxPeople())
