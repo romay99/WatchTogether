@@ -4,8 +4,7 @@
 혹은 OTT로 관람했던 영화를 사람들과 함께 극장에서 관람할 수 있게끔 하는 서비스입니다.
 
 ## ERD 
-![Image](https://github.com/user-attachments/assets/063e00f0-4172-4a5e-821e-610bb3b8374b)
-
+![Image](https://github.com/user-attachments/assets/bc50cb25-afbe-4bcd-89ce-d088983f8170)
 
 ## 프로젝트 기능 및 설계
 
@@ -49,6 +48,7 @@
     - 극장 이름 
     - 극장 설명
     - 극장 경도 / 위도
+    - 극장 수용인원원
     - 프로필 사진
    
 ***
@@ -71,8 +71,12 @@
   - 카카오페이 API 를 이용하여 사용자는 계정에 포인트를 충전할 수 있다.   
 
 - 프로필 사진 업로드 기능
-  - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다. 
-
+  - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다.
+ 
+***
+- CustomException 을 생성해 @RestControllerAdvice 를 붙인 ExceptionHandler 로 예외 처리
+- RestTemplate 를 이용해 HTTP 통신
+- Swagger 를 이용해 API 문서 작성
 
 
 ## Trouble Shooting
