@@ -1,4 +1,4 @@
-package com.watchtogether.watchtogether.api;
+package com.watchtogether.watchtogether.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +49,9 @@ public class TmdbApiService {
         .queryParam("language", "ko-KR")
         .encode().build().toUri();
 
+    // Header 생성
     HttpHeaders headers = new HttpHeaders();
+    // Header 에 API Key 설정
     headers.set("Authorization", "Bearer " + API_KEY);
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
