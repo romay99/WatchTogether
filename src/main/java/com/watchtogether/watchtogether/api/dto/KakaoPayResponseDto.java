@@ -1,11 +1,15 @@
 package com.watchtogether.watchtogether.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoPayResponseDto {
 
   private String tid; // 결제 고유 번호, 20자
