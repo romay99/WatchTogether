@@ -4,6 +4,11 @@ import com.watchtogether.watchtogether.api.dto.KakaoPayApproveDto;
 import com.watchtogether.watchtogether.api.dto.KakaoPayApproveResponseDto;
 import com.watchtogether.watchtogether.api.dto.KakaoPayReqeustDto;
 import com.watchtogether.watchtogether.api.dto.KakaoPayResponseDto;
+import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
+import com.watchtogether.watchtogether.history.point.entity.TransactionDetail;
+import com.watchtogether.watchtogether.history.point.service.TransactionHistoryService;
+import com.watchtogether.watchtogether.member.entity.Member;
+import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,15 +30,20 @@ public class KakaoPayApiService {
   private final String CID_KEY;
   private final String rootUri = "https://open-api.kakaopay.com";
   private final KakaoPayRedisService kakaoPayRedisService;
+  private final TransactionHistoryService transactionHistoryService;
+  private final MemberRepository memberRepository;
 
   // API KEY 를 application.properties 에서 가져온다.
   public KakaoPayApiService(@Value("${kakaoPay.apiKey}") String key,
       @Value("${kakaoPay.cidKey}") String cidKey, RestTemplateBuilder builder,
-      KakaoPayRedisService kakaoPayRedisService) {
+      KakaoPayRedisService kakaoPayRedisService, TransactionHistoryService service
+      , MemberRepository memberRepository) {
     this.API_KEY = key;
     this.CID_KEY = cidKey;
     this.restTemplate = builder.build();
     this.kakaoPayRedisService = kakaoPayRedisService;
+    this.transactionHistoryService = service;
+    this.memberRepository = memberRepository;
   }
 
   /**
@@ -44,6 +54,10 @@ public class KakaoPayApiService {
    * @return Kakao 서버에서 보내오는 결과값
    */
   public ResponseEntity<KakaoPayResponseDto> prepareChargePoint(String memberId, int amount) {
+    // 사용자 존재여부 검증
+    memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
+
     // 요청보내는 Uri 생성
     URI uri = UriComponentsBuilder.fromUriString(rootUri)
         .path("/online/v1/payment/ready")
@@ -70,7 +84,8 @@ public class KakaoPayApiService {
   }
 
   @Transactional
-  public KakaoPayApproveResponseDto approvedPointCharge(String pgToken, String memberId) {
+  public KakaoPayApproveResponseDto approvedPointCharge(String pgToken, String memberId,
+      int amount) {
     // 요청보내는 Uri 생성
     URI uri = UriComponentsBuilder.fromUriString(rootUri)
         .path("/online/v1/payment/approve")
@@ -103,9 +118,11 @@ public class KakaoPayApiService {
     //redis 에서 데이터 삭제
     kakaoPayRedisService.deleteKakaoPayData(memberId);
 
-    /*
-    TODO : DB에 거래기록 저장하는 기능 구현 必
-     */
+    // 이미 prepareChargePoint() 에서 사용자 존재여부는 검증 되었기때문에 get() 으로 가져온다.
+    Member member = memberRepository.findByMemberId(memberId).get();
+
+    // 거래 기록 저장 , 사용자 계좌내부 포인트 수량 변경
+    transactionHistoryService.usePoint(member, amount, TransactionDetail.CHARGE);
 
     return response.getBody();
   }

@@ -34,7 +34,8 @@ public class KakaoPayReqeustDto {
         .quantity(1)
         .total_amount(amount)
         .tax_free_amount(0)
-        .approval_url("http://localhost:8080/kp/success?member_id=" + memberId)
+        .approval_url(
+            "http://localhost:8080/kp/success?member_id=" + memberId + "&amount=" + amount)
         .cancel_url("http://localhost:8080/kp/cancel")
         .fail_url("http://localhost:8080/kp/fail")
         .build();

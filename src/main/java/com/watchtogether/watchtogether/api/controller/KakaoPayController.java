@@ -46,10 +46,11 @@ public class KakaoPayController {
    * @param memberId 거래중인 사용자 ID
    */
   @GetMapping("/success")
-  public ResponseEntity<KakaoPayApproveResponseDto> approvedPointCharge(@RequestParam("pg_token") String pgToken,
-      @RequestParam("member_id") String memberId) {
+  public ResponseEntity<KakaoPayApproveResponseDto> approvedPointCharge(
+      @RequestParam("pg_token") String pgToken,
+      @RequestParam("member_id") String memberId, @RequestParam int amount) {
     KakaoPayApproveResponseDto response = kakaoPayApiService
-        .approvedPointCharge(pgToken, memberId);
+        .approvedPointCharge(pgToken, memberId, amount);
     return ResponseEntity.ok(response);
   }
 
