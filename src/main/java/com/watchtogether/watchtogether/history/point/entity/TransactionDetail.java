@@ -1,5 +1,5 @@
 package com.watchtogether.watchtogether.history.point.entity;
 
 public enum TransactionDetail {
-  WATCH_MEETING, CANCEL
+  WATCH_MEETING, CANCEL , CHARGE
 }

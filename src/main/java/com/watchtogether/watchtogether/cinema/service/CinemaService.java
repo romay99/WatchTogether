@@ -54,6 +54,7 @@ public class CinemaService {
         .description(dto.getDescription())
         .coordinates(point)
         .member(member)
+        .maxPeople(dto.getMaxPeople())
         .build());
 
     log.info("{} 극장이 등록 완료되었습니다.", dto.getName());
@@ -88,6 +89,10 @@ public class CinemaService {
     if (dto.getDescription() != null) {
       cinema.setName(dto.getDescription());
     }
+    if (dto.getMaxPeople() != null) {
+      cinema.setMaxPeople(dto.getMaxPeople());
+    }
+
     // 위치 정보 수정
     if (dto.getLongitude() != null || dto.getLatitude() != null) {
       Double longitude = dto.getLongitude();

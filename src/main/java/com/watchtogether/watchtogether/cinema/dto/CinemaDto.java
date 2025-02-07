@@ -14,6 +14,7 @@ public class CinemaDto {
   private String description;
   private Double longitude;
   private Double latitude;
+  private Integer maxPeople;
 
   public static CinemaDto toDto(Cinema cinema) {
     return CinemaDto.builder()
@@ -21,6 +22,7 @@ public class CinemaDto {
         .description(cinema.getDescription())
         .longitude(cinema.getCoordinates().getX())
         .latitude(cinema.getCoordinates().getY())
+        .maxPeople(cinema.getMaxPeople())
         .build();
   }
 }

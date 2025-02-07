@@ -3,11 +3,14 @@ package com.watchtogether.watchtogether.exception;
 import com.watchtogether.watchtogether.exception.custom.AlreadyDibsException;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.DibsNotFoundException;
+import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
+import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
 import com.watchtogether.watchtogether.exception.custom.MovieAlreadyScreenAbleException;
 import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
+import com.watchtogether.watchtogether.exception.custom.MovieNotScreenAbleException;
 import com.watchtogether.watchtogether.exception.custom.PartnerCanHaveOneCinemaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -101,6 +104,36 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DibsNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleDibsNotFoundException(
       DibsNotFoundException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 상영 불가능한 영화로 같이볼까요? 생성할때 예외
+   */
+  @ExceptionHandler(MovieNotScreenAbleException.class)
+  public ResponseEntity<ErrorResponse> handleMovieNotScreenAbleException(
+      MovieNotScreenAbleException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 사용자 포인트가 충분하지 않을 때 예외처리
+   */
+  @ExceptionHandler(MemberNotEnoughPointException.class)
+  public ResponseEntity<ErrorResponse> handleMemberNotEnoughPointException(
+      MemberNotEnoughPointException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 이미 존재하는 시간대의 같이볼까요 일때 예외처리
+   */
+  @ExceptionHandler(MeetingAlreadyExistException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingAlreadyExistException(
+      MeetingAlreadyExistException e) {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
