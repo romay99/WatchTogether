@@ -42,6 +42,9 @@ public class Cinema {
   private Point coordinates;
 
   @Column(nullable = false)
+  private Integer maxPeople;
+
+  @Column(nullable = false)
   private LocalDate registerDate;
 
   private String profilePhotoUrl;

@@ -33,7 +33,10 @@ public class WatchMeeting {
   private LocalDateTime dateTime;
 
   @Column(nullable = false)
-  private int maxPeople;
+  private Integer maxPeople;
+
+  @Column(nullable = false)
+  private Integer nowPeople;
 
   @ManyToOne
   private Movie movie;

@@ -1,5 +1,6 @@
 package com.watchtogether.watchtogether.history.meeting.entity;
 
+import com.watchtogether.watchtogether.meeting.entity.WatchMeeting;
 import com.watchtogether.watchtogether.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,6 +36,9 @@ public class WatchMeetingHistory {
 
   @ManyToOne
   private Member member;
+
+  @ManyToOne
+  private WatchMeeting meeting;
 
   // DB 저장될때 거래 날짜/시간 생성
   @PrePersist
