@@ -49,8 +49,11 @@ public class KakaoPayController {
   public ResponseEntity<KakaoPayApproveResponseDto> approvedPointCharge(
       @RequestParam("pg_token") String pgToken,
       @RequestParam("member_id") String memberId, @RequestParam int amount) {
+    // api 요청을 보낸 후 받은 응답
     KakaoPayApproveResponseDto response = kakaoPayApiService
-        .approvedPointCharge(pgToken, memberId, amount);
+        .approvedPointCharge(pgToken, memberId);
+    // api 요청이 정상적으로 끝났다면 DB 에 저장
+    kakaoPayApiService.saveTransactionDataIntoDB(memberId, amount);
     return ResponseEntity.ok(response);
   }
 

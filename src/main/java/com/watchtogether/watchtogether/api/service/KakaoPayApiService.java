@@ -10,9 +10,9 @@ import com.watchtogether.watchtogether.history.point.service.TransactionHistoryS
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -23,28 +23,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KakaoPayApiService {
 
   private final RestTemplate restTemplate;
-  private final String API_KEY;
-  private final String CID_KEY;
+  @Value("${kakaoPay.apiKey}")
+  private String API_KEY;
+  @Value("${kakaoPay.cidKey}")
+  private String CID_KEY;
   private final String rootUri = "https://open-api.kakaopay.com";
   private final KakaoPayRedisService kakaoPayRedisService;
   private final TransactionHistoryService transactionHistoryService;
   private final MemberRepository memberRepository;
-
-  // API KEY 를 application.properties 에서 가져온다.
-  public KakaoPayApiService(@Value("${kakaoPay.apiKey}") String key,
-      @Value("${kakaoPay.cidKey}") String cidKey, RestTemplateBuilder builder,
-      KakaoPayRedisService kakaoPayRedisService, TransactionHistoryService service
-      , MemberRepository memberRepository) {
-    this.API_KEY = key;
-    this.CID_KEY = cidKey;
-    this.restTemplate = builder.build();
-    this.kakaoPayRedisService = kakaoPayRedisService;
-    this.transactionHistoryService = service;
-    this.memberRepository = memberRepository;
-  }
 
   /**
    * 카카오페이 결제를 위한 준비단계 메서드.
@@ -84,8 +74,7 @@ public class KakaoPayApiService {
   }
 
   @Transactional
-  public KakaoPayApproveResponseDto approvedPointCharge(String pgToken, String memberId,
-      int amount) {
+  public KakaoPayApproveResponseDto approvedPointCharge(String pgToken, String memberId) {
     // 요청보내는 Uri 생성
     URI uri = UriComponentsBuilder.fromUriString(rootUri)
         .path("/online/v1/payment/approve")
@@ -98,9 +87,9 @@ public class KakaoPayApiService {
     KakaoPayApproveDto request = KakaoPayApproveDto.builder()
         .cid(CID_KEY)
         .tid(tid)
-        .partner_order_id("1")
-        .partner_user_id(memberId)
-        .pg_token(pgToken)
+        .partnerOrderId("1")
+        .partnerUserId(memberId)
+        .pgToken(pgToken)
         .build();
 
     // Header 생성
@@ -118,12 +107,15 @@ public class KakaoPayApiService {
     //redis 에서 데이터 삭제
     kakaoPayRedisService.deleteKakaoPayData(memberId);
 
+    return response.getBody();
+  }
+
+  @Transactional
+  public void saveTransactionDataIntoDB(String memberId, int amount) {
     // 이미 prepareChargePoint() 에서 사용자 존재여부는 검증 되었기때문에 get() 으로 가져온다.
     Member member = memberRepository.findByMemberId(memberId).get();
 
     // 거래 기록 저장 , 사용자 계좌내부 포인트 수량 변경
     transactionHistoryService.usePoint(member, amount, TransactionDetail.CHARGE);
-
-    return response.getBody();
   }
 }
