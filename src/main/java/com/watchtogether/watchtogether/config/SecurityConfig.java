@@ -48,10 +48,11 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((request) ->
             request.requestMatchers(
-                    "/","/swagger-ui/**", "/v3/api-docs/**","/v3/api-docs").permitAll()
+                    "/", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                 .requestMatchers(
                     "/member/join", "/movie/list/screen", "/movie/detail/**",
-                    "/member/join", "/member/login", "/cinema/info","/movie/list").permitAll()
+                    "/member/join", "/member/login", "/cinema/info", "/movie/list"
+                    , "/member/info").permitAll()
 
                 .anyRequest().authenticated());
 
