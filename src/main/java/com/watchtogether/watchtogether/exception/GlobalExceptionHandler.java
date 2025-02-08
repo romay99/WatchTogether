@@ -4,6 +4,9 @@ import com.watchtogether.watchtogether.exception.custom.AlreadyDibsException;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.DibsNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
+import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyRegisterException;
+import com.watchtogether.watchtogether.exception.custom.MeetingMaxPeopleException;
+import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
 import com.watchtogether.watchtogether.exception.custom.MovieAlreadyScreenAbleException;
@@ -134,6 +137,36 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MeetingAlreadyExistException.class)
   public ResponseEntity<ErrorResponse> handleMeetingAlreadyExistException(
       MeetingAlreadyExistException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 같이볼까요 중복신청 예외처리
+   */
+  @ExceptionHandler(MeetingAlreadyRegisterException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingAlreadyRegisterException(
+      MeetingAlreadyRegisterException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 같이볼까요 인원초과 예외처리
+   */
+  @ExceptionHandler(MeetingMaxPeopleException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingMaxPeopleException(
+      MeetingMaxPeopleException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 같이볼까요 데이터가 존재하지 않을때 예외처리
+   */
+  @ExceptionHandler(MeetingNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingNotFoundException(
+      MeetingNotFoundException e) {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }

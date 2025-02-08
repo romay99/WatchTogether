@@ -5,19 +5,26 @@ import com.watchtogether.watchtogether.cinema.entity.Cinema;
 import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
+import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyRegisterException;
+import com.watchtogether.watchtogether.exception.custom.MeetingMaxPeopleException;
+import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MovieNotScreenAbleException;
+import com.watchtogether.watchtogether.history.meeting.entity.WatchMeetingHistory;
+import com.watchtogether.watchtogether.history.meeting.repository.MeetingHistoryRepository;
 import com.watchtogether.watchtogether.history.meeting.service.MeetingHistoryService;
 import com.watchtogether.watchtogether.history.point.entity.TransactionDetail;
 import com.watchtogether.watchtogether.history.point.service.TransactionHistoryService;
 import com.watchtogether.watchtogether.meeting.dto.MeetingCreateDto;
+import com.watchtogether.watchtogether.meeting.dto.MeetingJoinResponseDto;
 import com.watchtogether.watchtogether.meeting.entity.WatchMeeting;
 import com.watchtogether.watchtogether.meeting.repository.MeetingRepository;
 import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.repository.MovieRepository;
+import com.watchtogether.watchtogether.movie.service.MovieService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +43,8 @@ public class MeetingService {
   private final TmdbApiService tmdbApiService;
   private final TransactionHistoryService transactionHistoryService;
   private final MeetingHistoryService meetingHistoryService;
+  private final MeetingHistoryRepository meetingHistoryRepository;
+  private final MovieService movieService;
 
   @Transactional
   public WatchMeeting createWatchMeeting(String memberId, MeetingCreateDto dto) {
@@ -53,7 +62,7 @@ public class MeetingService {
         .orElseGet(() ->
             {
               Movie newMovie = tmdbApiService.findMovieById(movieCode);
-              return movieRepository.save(newMovie);
+              return movieService.saveMovie(newMovie);
             }
         );
 
@@ -87,8 +96,51 @@ public class MeetingService {
         .build();
     WatchMeeting savedMeeting = meetingRepository.save(watchMeeting);
     // 같이볼까요 신청기록 저장
-    meetingHistoryService.recordMeetingHistory(member,savedMeeting);
+    meetingHistoryService.recordMeetingHistory(member, savedMeeting);
 
     return watchMeeting;
+  }
+
+  @Transactional
+  public MeetingJoinResponseDto joinMeeting(Long meetingId, String memberId) {
+    // 존재하지 않는 사용자라면 예외 발생
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
+
+    // point 가 충분하지 않을 시 예외 발생
+    if (member.getPoint() < 15000) {
+      throw new MemberNotEnoughPointException("포인트 충전후 이용 가능합니다.");
+    }
+
+    // 같이볼까요가 존재하지 않는다면 예외 발생
+    WatchMeeting watchMeeting = meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
+
+    // 인원이 모두 찼으면 예외 발생
+    if (watchMeeting.getMaxPeople() == watchMeeting.getNowPeople() + 1) {
+      throw new MeetingMaxPeopleException("정원초과");
+    }
+
+    if (meetingHistoryRepository.existsByMemberMemberIdAndMeetingCode(memberId, meetingId)) {
+      throw new MeetingAlreadyRegisterException("'같이볼까요' 중복 신청은 불가능합니다.");
+    }
+
+    // 같이볼까요 신청기록 저장
+    WatchMeetingHistory watchMeetingHistory = meetingHistoryService.recordMeetingHistory(member,
+        watchMeeting);
+    // 포인트 사용기록 저장
+    transactionHistoryService.usePoint(member, -15000, TransactionDetail.WATCH_MEETING);
+
+    // '같이볼까요' 현재 인원 업데이트
+    watchMeeting.setNowPeople(watchMeeting.getNowPeople() + 1);
+    WatchMeeting newMeeting = meetingRepository.save(watchMeeting);
+
+    // DTO 로 변환후 return
+    return MeetingJoinResponseDto.builder()
+        .meetingDateTime(newMeeting.getDateTime())
+        .joinDateTime(watchMeetingHistory.getJoinDateTime())
+        .message("성공적으로 같이볼까요 신청이 완료되었습니다.")
+        .cinemaName(newMeeting.getCinema().getName())
+        .build();
   }
 }
