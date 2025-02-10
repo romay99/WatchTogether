@@ -98,6 +98,9 @@ public class MeetingService {
     // 같이볼까요 신청기록 저장
     meetingHistoryService.recordMeetingHistory(member, savedMeeting);
 
+    log.info("{} 님이 {} 영화의 같이볼까요를 생성했습니다. 생성일시 = {}",
+        memberId, movie.getTitle(), savedMeeting.getDateTime());
+
     return watchMeeting;
   }
 
@@ -134,6 +137,9 @@ public class MeetingService {
     // '같이볼까요' 현재 인원 업데이트
     watchMeeting.setNowPeople(watchMeeting.getNowPeople() + 1);
     WatchMeeting newMeeting = meetingRepository.save(watchMeeting);
+
+    log.info("{} 님이 {} 영화의 {} 시간에 같이볼까요를 참여했습니다.",
+        memberId, watchMeeting.getMovie().getTitle(), newMeeting.getDateTime());
 
     // DTO 로 변환후 return
     return MeetingJoinResponseDto.builder()

@@ -117,5 +117,6 @@ public class KakaoPayApiService {
 
     // 거래 기록 저장 , 사용자 계좌내부 포인트 수량 변경
     transactionHistoryService.usePoint(member, amount, TransactionDetail.CHARGE);
+    log.info("{} 님의 계정에 {} 포인트가 충전되었습니다.", memberId, amount);
   }
 }

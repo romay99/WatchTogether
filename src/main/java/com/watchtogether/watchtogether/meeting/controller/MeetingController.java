@@ -38,6 +38,7 @@ public class MeetingController {
 
   @PostMapping("/join")
   @PreAuthorize("hasRole('ROLE_USER')")
+  @Operation(summary = "같이볼까요 참여", description = "같이볼까요에 참가합니다. 포인트가 15000 포인트 차감됩니다.")
   public ResponseEntity<MeetingJoinResponseDto> joinMeeting(@RequestParam Long meetingId) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
