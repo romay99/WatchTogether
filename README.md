@@ -69,6 +69,7 @@
 
 - 포인트 충전 기능
   - 카카오페이 API 를 이용하여 사용자는 계정에 포인트를 충전할 수 있다.   
+   **Ref. https://developers.kakaopay.com/docs/payment/online/common**
 
 - 프로필 사진 업로드 기능
   - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다.
