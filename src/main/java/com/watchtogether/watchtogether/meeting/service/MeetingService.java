@@ -11,6 +11,7 @@ import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException
 import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MovieNotScreenAbleException;
+import com.watchtogether.watchtogether.history.meeting.dto.MeetingHistoryDto;
 import com.watchtogether.watchtogether.history.meeting.entity.WatchMeetingHistory;
 import com.watchtogether.watchtogether.history.meeting.repository.MeetingHistoryRepository;
 import com.watchtogether.watchtogether.history.meeting.service.MeetingHistoryService;
@@ -26,8 +27,11 @@ import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.repository.MovieRepository;
 import com.watchtogether.watchtogether.movie.service.MovieService;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,5 +152,24 @@ public class MeetingService {
         .message("성공적으로 같이볼까요 신청이 완료되었습니다.")
         .cinemaName(newMeeting.getCinema().getName())
         .build();
+  }
+
+  public List<MeetingHistoryDto> meetinghistory(int page, int size, String memberId) {
+    // 존재하지 않는 사용자라면 예외 밟생
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
+
+    Pageable pageable = PageRequest.of(--page, size); // 페이징을 위한 Pageable 객체 생성
+
+    List<WatchMeetingHistory> list = meetingHistoryService // WatchMeetingHistory -> DTO 변환 필요
+        .readMeetingHistory(memberId, pageable);
+
+    // MeetingHistoryDto List 로 변환 후 return
+    return list.stream().map(data -> MeetingHistoryDto.builder()
+        .canceledDateTime(data.getCancelDateTime())
+        .dateTime(data.getJoinDateTime())
+        .movieTitle(data.getMeeting().getMovie().getTitle())
+        .cinemaName(data.getMeeting().getCinema().getName())
+        .build()).toList();
   }
 }
