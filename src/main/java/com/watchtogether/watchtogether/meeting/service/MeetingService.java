@@ -1,6 +1,6 @@
 package com.watchtogether.watchtogether.meeting.service;
 
-import com.watchtogether.watchtogether.api.TmdbApiService;
+import com.watchtogether.watchtogether.api.service.TmdbApiService;
 import com.watchtogether.watchtogether.cinema.entity.Cinema;
 import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
@@ -87,7 +87,7 @@ public class MeetingService {
         .build();
     WatchMeeting savedMeeting = meetingRepository.save(watchMeeting);
     // 같이볼까요 신청기록 저장
-    meetingHistoryService.recordMeetingHistory(member,savedMeeting);
+    meetingHistoryService.recordMeetingHistory(member, savedMeeting);
 
     return watchMeeting;
   }

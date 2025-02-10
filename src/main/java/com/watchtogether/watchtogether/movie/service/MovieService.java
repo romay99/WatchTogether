@@ -1,6 +1,6 @@
 package com.watchtogether.watchtogether.movie.service;
 
-import com.watchtogether.watchtogether.api.TmdbApiService;
+import com.watchtogether.watchtogether.api.service.TmdbApiService;
 import com.watchtogether.watchtogether.movie.dto.MovieIdNameDateDto;
 import com.watchtogether.watchtogether.movie.dto.MovieListPageDto;
 import com.watchtogether.watchtogether.movie.entity.Movie;
