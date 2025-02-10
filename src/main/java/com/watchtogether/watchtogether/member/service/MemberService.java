@@ -5,6 +5,7 @@ import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseExcept
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
 import com.watchtogether.watchtogether.jwt.JwtProvider;
+import com.watchtogether.watchtogether.member.dto.MemberInfoDto;
 import com.watchtogether.watchtogether.member.dto.MemberJoinDto;
 import com.watchtogether.watchtogether.member.dto.MemberLoginDto;
 import com.watchtogether.watchtogether.member.dto.MemberUpdateDto;
@@ -126,5 +127,21 @@ public class MemberService {
       cinemaRepository.deleteByMemberMemberId(memberId);
     }
     memberRepository.delete(member);
+  }
+
+  /**
+   * 회원정보 조회하기
+   * @param memberId 조회하려는 사용자 ID
+   * @return 사용자 정보를 담은 DTO
+   */
+  public MemberInfoDto getMemberInfo(String memberId) {
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
+
+    return MemberInfoDto.builder()
+        .memberId(member.getMemberId())
+        .memberName(member.getName())
+        .registerDate(member.getRegisterDate())
+        .build();
   }
 }

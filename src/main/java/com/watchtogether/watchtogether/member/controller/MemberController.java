@@ -1,5 +1,6 @@
 package com.watchtogether.watchtogether.member.controller;
 
+import com.watchtogether.watchtogether.member.dto.MemberInfoDto;
 import com.watchtogether.watchtogether.member.dto.MemberJoinDto;
 import com.watchtogether.watchtogether.member.dto.MemberLoginDto;
 import com.watchtogether.watchtogether.member.dto.MemberUpdateDto;
@@ -15,10 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -84,5 +87,19 @@ public class MemberController {
     memberService.deleteMember(memberId);
     log.info("{}님의 정보가 삭제되었습니다.", memberId);
     return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
+  }
+
+  /**
+   * 회원 정보 조회하는 메서드
+   *
+   * @param memberId 조회하려는 사용자의 ID
+   * @return 사용자 정보
+   */
+  @GetMapping("/info")
+  @Operation(summary = "회원정보 조회", description = "사용자의 ID 를 이용해 회원정보를 조회하는 기능입니다.")
+  public ResponseEntity<MemberInfoDto> getMemberInfo(@RequestParam String memberId) {
+    MemberInfoDto memberInfo = memberService.getMemberInfo(memberId);
+    return ResponseEntity.ok(memberInfo);
+
   }
 }

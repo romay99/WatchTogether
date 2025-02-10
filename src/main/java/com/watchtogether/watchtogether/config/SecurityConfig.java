@@ -53,6 +53,9 @@ public class SecurityConfig {
                     "/member/join", "/movie/list/screen", "/movie/detail/**",
                     "/member/join", "/member/login", "/cinema/info", "/movie/list").permitAll()
                 .requestMatchers("/kp/fail", "/kp/success", "/kp/cancel").permitAll()
+                    "/member/join", "/member/login", "/cinema/info", "/movie/list"
+                    , "/member/info").permitAll()
+
                 .anyRequest().authenticated());
 
     // JWT 필터 추가
