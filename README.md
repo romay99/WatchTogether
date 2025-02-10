@@ -4,8 +4,7 @@
 혹은 OTT로 관람했던 영화를 사람들과 함께 극장에서 관람할 수 있게끔 하는 서비스입니다.
 
 ## ERD 
-![Image](https://github.com/user-attachments/assets/063e00f0-4172-4a5e-821e-610bb3b8374b)
-
+![Image](https://github.com/user-attachments/assets/bc50cb25-afbe-4bcd-89ce-d088983f8170)
 
 ## 프로젝트 기능 및 설계
 
@@ -33,6 +32,11 @@
   - 사용자는 포인트를 충전할 수 있다. (카카오페이 API 이용)
   - 이 포인트는 <같이 봐요> 생성 및 신청에 사용된다.
   - PARTNER 계정은 포인트 충전이 불가능하다.
+ 
+- 찜 기능
+  - 사용자는 상영가능 영화 목록에 존재하지 않는 영화들을 자유롭게 "찜"할 수 있다.
+  - "찜" 갯수가 100개( 확정 X ) 이상인 영화들은 배급사와 합의를 통해 상영가능 영화로 변환된다.
+  - "찜" 을 많이 당한 영화가 "상영가능 상태" 로 변경된다면 찜 테이블의 해당영화 데이터들은 삭제된다.
 ***
 ### 극장 / 영화 관련 기능📽
 - 극장 등록기능
@@ -44,12 +48,8 @@
     - 극장 이름 
     - 극장 설명
     - 극장 경도 / 위도
+    - 극장 수용인원원
     - 프로필 사진
-
-- 찜 기능
-  - 사용자는 상영가능 영화 목록에 존재하지 않는 영화들을 자유롭게 "찜"할 수 있다.
-  - "찜" 갯수가 100개( 확정 X ) 이상인 영화들은 배급사와 합의를 통해 상영가능 영화로 변환된다.
-  - "찜" 을 많이 당한 영화가 "상영가능 상태" 로 변경된다면 찜 테이블의 해당영화 데이터들은 삭제된다.
    
 ***
 ### 같이 봐요 기능👩‍💼🦸‍♀️
@@ -71,8 +71,12 @@
   - 카카오페이 API 를 이용하여 사용자는 계정에 포인트를 충전할 수 있다.   
 
 - 프로필 사진 업로드 기능
-  - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다. 
-
+  - AWS S3 를 이용해 사용자 / 극장의 프로필 사진을 업로드 할 수 있다.
+ 
+***
+- CustomException 을 생성해 @RestControllerAdvice 를 붙인 ExceptionHandler 로 예외 처리
+- RestTemplate 를 이용해 HTTP 통신
+- Swagger 를 이용해 API 문서 작성
 
 
 ## Trouble Shooting
@@ -88,4 +92,5 @@ https://political-plant-c63.notion.site/183ff19351e7805194f4ec1e54cd0bfb
 <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white">
 <img src="https://img.shields.io/badge/Amazon%20S3-569A31?style=for-the-badge&logo=Amazon%20S3&logoColor=white">
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
 
