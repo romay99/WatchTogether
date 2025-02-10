@@ -52,9 +52,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/member/join", "/movie/list/screen", "/movie/detail/**",
                     "/member/join", "/member/login", "/cinema/info", "/movie/list").permitAll()
-                .requestMatchers("/kp/fail", "/kp/success", "/kp/cancel").permitAll()
-                    "/member/join", "/member/login", "/cinema/info", "/movie/list"
-                    , "/member/info").permitAll()
+                .requestMatchers("/kp/fail", "/kp/success", "/kp/cancel", "/member/info")
+                .permitAll()
 
                 .anyRequest().authenticated());
 
