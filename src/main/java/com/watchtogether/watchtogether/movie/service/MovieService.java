@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +61,15 @@ public class MovieService {
         .totalPageNumber(list.getTotalPages())
         .data(list.stream().map((movie) -> MovieIdNameDateDto.toDto(movie)).toList())
         .build();
+  }
+
+  /**
+   * 독립된 트랜잭션에서 영화 데이터를 저장할때 필요한 메서드
+   * @param movie 저장할 영화 정보
+   * @return 저장된 영화 정보
+   */
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Movie saveMovie(Movie movie) {
+    return movieRepository.save(movie);
   }
 }

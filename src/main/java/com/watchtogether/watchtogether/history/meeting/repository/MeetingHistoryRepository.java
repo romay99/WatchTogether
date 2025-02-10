@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MeetingHistoryRepository extends JpaRepository<WatchMeetingHistory, Long> {
 
+  boolean existsByMemberMemberIdAndMeetingCode(String memberId, Long meetingCode);
+
 
 }

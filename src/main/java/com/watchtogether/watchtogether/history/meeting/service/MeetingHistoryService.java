@@ -7,6 +7,7 @@ import com.watchtogether.watchtogether.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -19,12 +20,12 @@ public class MeetingHistoryService {
    * @param member 신청한 Member
    * @param meeting 신청한 같이볼까요 데이터
    */
-  public void recordMeetingHistory(Member member, WatchMeeting meeting) {
+  @Transactional
+  public WatchMeetingHistory recordMeetingHistory(Member member, WatchMeeting meeting) {
     WatchMeetingHistory history = WatchMeetingHistory.builder()
         .meeting(meeting)
         .member(member)
         .build();
-    meetingHistoryRepository.save(history);
-
+    return meetingHistoryRepository.save(history);
   }
 }
