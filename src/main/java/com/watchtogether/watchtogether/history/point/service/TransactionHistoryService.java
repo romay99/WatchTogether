@@ -8,6 +8,7 @@ import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -18,13 +19,13 @@ public class TransactionHistoryService {
   private final MemberRepository memberRepository;
 
   /**
-   * 포인트 사용하는 메서드 이 메서드를 호출함으로써 포인트 차감 / 증가가 된다. 트랜잭션은 이 메서드를 호출하는 쪽 한곳에서만 적용한다. 호출한 쪽 메서드에서 예외가
-   * 발생하면 usePoint() 메서드도 롤백된다.
+   * 포인트 사용하는 메서드 이 메서드를 호출함으로써 포인트 차감 / 증가가 된다.
    *
    * @param member 사용하려는 Member
    * @param amount 사용하려는 포인트 양 (양수는 충전 , 음수는 사용)
    * @param detail 사용하는 사용처
    */
+  @Transactional
   public void usePoint(Member member, int amount, TransactionDetail detail) {
     // 거래정보를 담은 history 데이터 생성
     PointTransactionHistory history = PointTransactionHistory.builder()

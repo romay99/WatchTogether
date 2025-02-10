@@ -1,13 +1,13 @@
-package com.watchtogether.watchtogether.api;
+package com.watchtogether.watchtogether.api.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.watchtogether.watchtogether.exception.custom.MovieDataNotFoundException;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,18 +20,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TmdbApiService {
 
-  private final String API_KEY;
+  @Value("${tmdb.apiKey}")
+  private String API_KEY;
   private final String rootUri = "https://api.themoviedb.org/3";
   private final String posterBaseUri = "https://image.tmdb.org/t/p/original";
   private final RestTemplate restTemplate;
-
-  // API KEY 를 application.properties 에서 가져온다.
-  public TmdbApiService(@Value("${tmdb.apiKey}") String key, RestTemplateBuilder builder) {
-    this.API_KEY = key;
-    this.restTemplate = builder.build();
-  }
 
   /**
    * 영화 제목으로 영화 목록 가져오기
@@ -39,17 +35,19 @@ public class TmdbApiService {
    * @param title 영화제목
    * @return 영화들의 List 리턴
    */
-  public ResponseEntity<String> getMovieList(int page,String title) {
+  public ResponseEntity<String> getMovieList(int page, String title) {
     // API 요청을 위한 URI 생성
     URI uri = UriComponentsBuilder.fromUriString(rootUri)
         .path("/search/movie")
         .queryParam("query", title)
-        .queryParam("page",page)
+        .queryParam("page", page)
         .queryParam("include_adult", "true")
         .queryParam("language", "ko-KR")
         .encode().build().toUri();
 
+    // Header 생성
     HttpHeaders headers = new HttpHeaders();
+    // Header 에 API Key 설정
     headers.set("Authorization", "Bearer " + API_KEY);
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
