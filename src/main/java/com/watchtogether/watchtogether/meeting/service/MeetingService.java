@@ -6,6 +6,7 @@ import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyRegisterException;
+import com.watchtogether.watchtogether.exception.custom.MeetingCancelNotValidDateException;
 import com.watchtogether.watchtogether.exception.custom.MeetingMaxPeopleException;
 import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
@@ -17,6 +18,7 @@ import com.watchtogether.watchtogether.history.meeting.repository.MeetingHistory
 import com.watchtogether.watchtogether.history.meeting.service.MeetingHistoryService;
 import com.watchtogether.watchtogether.history.point.entity.TransactionDetail;
 import com.watchtogether.watchtogether.history.point.service.TransactionHistoryService;
+import com.watchtogether.watchtogether.meeting.dto.MeetingCancelInfoDto;
 import com.watchtogether.watchtogether.meeting.dto.MeetingCreateDto;
 import com.watchtogether.watchtogether.meeting.dto.MeetingJoinResponseDto;
 import com.watchtogether.watchtogether.meeting.entity.WatchMeeting;
@@ -26,6 +28,7 @@ import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.repository.MovieRepository;
 import com.watchtogether.watchtogether.movie.service.MovieService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +99,7 @@ public class MeetingService {
         .movie(movie)
         .cinema(cinema)
         .member(member)
+        .dateTime(dto.getTime())
         .nowPeople(1)
         .build();
     WatchMeeting savedMeeting = meetingRepository.save(watchMeeting);
@@ -171,5 +175,65 @@ public class MeetingService {
         .movieTitle(data.getMeeting().getMovie().getTitle())
         .cinemaName(data.getMeeting().getCinema().getName())
         .build()).toList();
+  }
+
+  @Transactional
+  public MeetingCancelInfoDto cancelMeeting(String memberId, Long meetingId) {
+    // 존재하지 않는 사용자라면 예외 밟생
+    Member member = memberRepository.findByMemberId(memberId)
+        .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자입니다."));
+
+    // 존재하지 않는 같이볼까요 라면 예외 발생
+    WatchMeeting watchMeeting = meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 정보입니다."));
+
+    // 현재날짜 기준 취소하려는 같이볼까요가 3일 이내면 예외 발생
+    if (!checkDate(watchMeeting.getDateTime(), LocalDateTime.now())) {
+      throw new MeetingCancelNotValidDateException("취소 불가능한 날짜의 같이볼까요 입니다.");
+    }
+
+    // 같이볼까요의 현재인원 수정
+    watchMeeting.setNowPeople(watchMeeting.getNowPeople() - 1);
+    WatchMeeting newMeeting = meetingRepository.save(watchMeeting);
+
+    // 포인트 거래내역 추가
+    // 이 usePoint() 내부에 사용자 계정 내부 포인트 변경기능도 포함되어있음.
+    transactionHistoryService.usePoint(member, 15000, TransactionDetail.CANCEL);
+
+    // 신청기록 내부에 취소기록 기입
+    meetingHistoryService.cancelMeetingHistory(member, newMeeting);
+
+    // 만약 모든 인원이 취소했다면 이 같이볼까요는 삭제된다.
+    if (newMeeting.getNowPeople() == 0) {
+      meetingRepository.deleteById(newMeeting.getCode());
+    }
+
+    log.info("{} 님의 같이볼까요 신청이 취소되었습니다. 취소된 같이볼까요 날짜 = {}", memberId, newMeeting.getDateTime());
+
+    return MeetingCancelInfoDto.builder()
+        .movieTitle(newMeeting.getMovie().getTitle())
+        .dateTime(newMeeting.getDateTime())
+        .build();
+  }
+
+  /**
+   * 같이볼까요 취소를 위해 날짜 비교하는 메서드
+   *
+   * @param dateTime 같이볼까요의 날짜
+   * @param now      취소하려는 현재 날짜
+   * @return true == 취소 가능 / false == 취소 불가능
+   */
+  private boolean checkDate(LocalDateTime dateTime, LocalDateTime now) {
+    // A 데이터에서 날짜만 추출
+    LocalDate dateA = dateTime.toLocalDate();
+
+    // B 데이터에서 날짜만 추출
+    LocalDate dateB = now.toLocalDate();
+
+    // 3일 차이 확인
+    if (dateA.minusDays(3).isBefore(dateB)) {
+      return false; // false = 불가능
+    }
+    return true; // 가능
   }
 }
