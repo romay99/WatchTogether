@@ -3,6 +3,7 @@ package com.watchtogether.watchtogether.meeting.service;
 import com.watchtogether.watchtogether.api.service.TmdbApiService;
 import com.watchtogether.watchtogether.cinema.entity.Cinema;
 import com.watchtogether.watchtogether.cinema.repository.CinemaRepository;
+import com.watchtogether.watchtogether.config.DateUtil;
 import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyRegisterException;
@@ -28,7 +29,6 @@ import com.watchtogether.watchtogether.member.repository.MemberRepository;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import com.watchtogether.watchtogether.movie.repository.MovieRepository;
 import com.watchtogether.watchtogether.movie.service.MovieService;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +52,7 @@ public class MeetingService {
   private final MeetingHistoryService meetingHistoryService;
   private final MeetingHistoryRepository meetingHistoryRepository;
   private final MovieService movieService;
+  private final DateUtil dateUtil;
 
   @Transactional
   public WatchMeeting createWatchMeeting(String memberId, MeetingCreateDto dto) {
@@ -188,7 +189,7 @@ public class MeetingService {
         .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 정보입니다."));
 
     // 현재날짜 기준 취소하려는 같이볼까요가 3일 이내면 예외 발생
-    if (!checkDate(watchMeeting.getDateTime(), LocalDateTime.now())) {
+    if (!dateUtil.checkDate(watchMeeting.getDateTime(), LocalDateTime.now(), 3)) {
       throw new MeetingCancelNotValidDateException("취소 불가능한 날짜의 같이볼까요 입니다.");
     }
 
@@ -214,26 +215,5 @@ public class MeetingService {
         .movieTitle(newMeeting.getMovie().getTitle())
         .dateTime(newMeeting.getDateTime())
         .build();
-  }
-
-  /**
-   * 같이볼까요 취소를 위해 날짜 비교하는 메서드
-   *
-   * @param dateTime 같이볼까요의 날짜
-   * @param now      취소하려는 현재 날짜
-   * @return true == 취소 가능 / false == 취소 불가능
-   */
-  private boolean checkDate(LocalDateTime dateTime, LocalDateTime now) {
-    // A 데이터에서 날짜만 추출
-    LocalDate dateA = dateTime.toLocalDate();
-
-    // B 데이터에서 날짜만 추출
-    LocalDate dateB = now.toLocalDate();
-
-    // 3일 차이 확인
-    if (dateA.minusDays(3).isBefore(dateB)) {
-      return false; // false = 불가능
-    }
-    return true; // 가능
   }
 }
