@@ -60,6 +60,9 @@ public class MeetingService {
   private final RedissonClient redisson;
   private static final String MEETING_LOCK_NAME = "MEET_LOCK";
   private static final String MEETING_DELETE_LOCK_NAME = "MEET_DELETE_LOCK";
+  private static final int LOCK_LEASE_TIME = 5;
+  private static final int LOCK_WAIT_TIME = 10;
+
 
   @Transactional
   public WatchMeeting createWatchMeeting(String memberId, MeetingCreateDto dto) {
@@ -140,7 +143,7 @@ public class MeetingService {
     // Lock 을 이용한 동시성 처리
     RLock lock = redisson.getLock(MEETING_LOCK_NAME);
     try {
-      if (lock.tryLock(10, 5, TimeUnit.SECONDS)) {
+      if (lock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, TimeUnit.SECONDS)) { // 10초동안 대기 , 5초동안 점유
         // 같이볼까요가 존재하지 않는다면 예외 발생
         watchMeeting = meetingRepository.findById(meetingId)
             .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
@@ -217,7 +220,7 @@ public class MeetingService {
     // Lock 을 이용한 동시성 처리
     RLock lock = redisson.getLock(MEETING_DELETE_LOCK_NAME);
     try {
-      if (lock.tryLock(10, 5, TimeUnit.SECONDS)) {
+      if (lock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, TimeUnit.SECONDS)) { // 10초동안 대기 , 5초동안 점유
         // 같이볼까요가 존재하지 않는다면 예외 발생
         watchMeeting = meetingRepository.findById(meetingId)
             .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
