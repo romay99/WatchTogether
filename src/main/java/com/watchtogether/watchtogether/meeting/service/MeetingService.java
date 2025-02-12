@@ -13,6 +13,7 @@ import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException
 import com.watchtogether.watchtogether.exception.custom.MemberNotEnoughPointException;
 import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MovieNotScreenAbleException;
+import com.watchtogether.watchtogether.exception.custom.RedissonClientLockedException;
 import com.watchtogether.watchtogether.history.meeting.dto.MeetingHistoryDto;
 import com.watchtogether.watchtogether.history.meeting.entity.WatchMeetingHistory;
 import com.watchtogether.watchtogether.history.meeting.repository.MeetingHistoryRepository;
@@ -31,8 +32,11 @@ import com.watchtogether.watchtogether.movie.repository.MovieRepository;
 import com.watchtogether.watchtogether.movie.service.MovieService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,6 +57,9 @@ public class MeetingService {
   private final MeetingHistoryRepository meetingHistoryRepository;
   private final MovieService movieService;
   private final DateUtil dateUtil;
+  private final RedissonClient redisson;
+  private static final String MEETING_LOCK_NAME = "MEET_LOCK";
+  private static final String MEETING_DELETE_LOCK_NAME = "MEET_DELETE_LOCK";
 
   @Transactional
   public WatchMeeting createWatchMeeting(String memberId, MeetingCreateDto dto) {
@@ -124,17 +131,35 @@ public class MeetingService {
       throw new MemberNotEnoughPointException("포인트 충전후 이용 가능합니다.");
     }
 
-    // 같이볼까요가 존재하지 않는다면 예외 발생
-    WatchMeeting watchMeeting = meetingRepository.findById(meetingId)
-        .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
-
-    // 인원이 모두 찼으면 예외 발생
-    if (watchMeeting.getMaxPeople() == watchMeeting.getNowPeople() + 1) {
-      throw new MeetingMaxPeopleException("정원초과");
-    }
-
+    // 중복신청일 경우 예외 발생
     if (meetingHistoryRepository.existsByMemberMemberIdAndMeetingCode(memberId, meetingId)) {
       throw new MeetingAlreadyRegisterException("'같이볼까요' 중복 신청은 불가능합니다.");
+    }
+
+    WatchMeeting watchMeeting;
+    // Lock 을 이용한 동시성 처리
+    RLock lock = redisson.getLock(MEETING_LOCK_NAME);
+    try {
+      if (lock.tryLock(10, 5, TimeUnit.SECONDS)) {
+        // 같이볼까요가 존재하지 않는다면 예외 발생
+        watchMeeting = meetingRepository.findById(meetingId)
+            .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
+        // 인원이 모두 찼으면 예외 발생
+        if (watchMeeting.getMaxPeople() == watchMeeting.getNowPeople()) {
+          throw new MeetingMaxPeopleException("정원초과");
+        }
+        // '같이볼까요' 현재 인원 업데이트
+        watchMeeting.setNowPeople(watchMeeting.getNowPeople() + 1);
+        watchMeeting = meetingRepository.save(watchMeeting);
+      } else {
+        throw new RedissonClientLockedException("다른 사용자가 처리 중입니다. 잠시 후에 다시 요청해주세요");
+      }
+    } catch (InterruptedException e) {
+      log.error(e.getMessage());
+      throw new RuntimeException("요청에 실패하였습니다.");
+    } finally {
+      // 요청 완료한뒤 락 해제
+      lock.unlock();
     }
 
     // 같이볼까요 신청기록 저장
@@ -143,19 +168,15 @@ public class MeetingService {
     // 포인트 사용기록 저장
     transactionHistoryService.usePoint(member, -15000, TransactionDetail.WATCH_MEETING);
 
-    // '같이볼까요' 현재 인원 업데이트
-    watchMeeting.setNowPeople(watchMeeting.getNowPeople() + 1);
-    WatchMeeting newMeeting = meetingRepository.save(watchMeeting);
-
     log.info("{} 님이 {} 영화의 {} 시간에 같이볼까요를 참여했습니다.",
-        memberId, watchMeeting.getMovie().getTitle(), newMeeting.getDateTime());
+        memberId, watchMeeting.getMovie().getTitle(), watchMeeting.getDateTime());
 
     // DTO 로 변환후 return
     return MeetingJoinResponseDto.builder()
-        .meetingDateTime(newMeeting.getDateTime())
+        .meetingDateTime(watchMeeting.getDateTime())
         .joinDateTime(watchMeetingHistory.getJoinDateTime())
         .message("성공적으로 같이볼까요 신청이 완료되었습니다.")
-        .cinemaName(newMeeting.getCinema().getName())
+        .cinemaName(watchMeeting.getCinema().getName())
         .build();
   }
 
@@ -193,27 +214,44 @@ public class MeetingService {
       throw new MeetingCancelNotValidDateException("취소 불가능한 날짜의 같이볼까요 입니다.");
     }
 
-    // 같이볼까요의 현재인원 수정
-    watchMeeting.setNowPeople(watchMeeting.getNowPeople() - 1);
-    WatchMeeting newMeeting = meetingRepository.save(watchMeeting);
+    // Lock 을 이용한 동시성 처리
+    RLock lock = redisson.getLock(MEETING_DELETE_LOCK_NAME);
+    try {
+      if (lock.tryLock(10, 5, TimeUnit.SECONDS)) {
+        // 같이볼까요가 존재하지 않는다면 예외 발생
+        watchMeeting = meetingRepository.findById(meetingId)
+            .orElseThrow(() -> new MeetingNotFoundException("존재하지 않는 같이볼까요 입니다."));
+
+        // 같이볼까요의 현재인원 수정
+        watchMeeting.setNowPeople(watchMeeting.getNowPeople() - 1);
+        watchMeeting = meetingRepository.save(watchMeeting);
+      } else {
+        throw new RedissonClientLockedException("다른 사용자가 처리 중입니다. 잠시 후에 다시 요청해주세요");
+      }
+    } catch (InterruptedException e) {
+      log.error(e.getMessage());
+      throw new RuntimeException("요청에 실패하였습니다.");
+    } finally {
+      lock.unlock();
+    }
 
     // 포인트 거래내역 추가
     // 이 usePoint() 내부에 사용자 계정 내부 포인트 변경기능도 포함되어있음.
     transactionHistoryService.usePoint(member, 15000, TransactionDetail.CANCEL);
 
     // 신청기록 내부에 취소기록 기입
-    meetingHistoryService.cancelMeetingHistory(member, newMeeting);
+    meetingHistoryService.cancelMeetingHistory(member, watchMeeting);
 
     // 만약 모든 인원이 취소했다면 이 같이볼까요는 삭제된다.
-    if (newMeeting.getNowPeople() == 0) {
-      meetingRepository.deleteById(newMeeting.getCode());
+    if (watchMeeting.getNowPeople() == 0) {
+      meetingRepository.deleteById(watchMeeting.getCode());
     }
 
-    log.info("{} 님의 같이볼까요 신청이 취소되었습니다. 취소된 같이볼까요 날짜 = {}", memberId, newMeeting.getDateTime());
+    log.info("{} 님의 같이볼까요 신청이 취소되었습니다. 취소된 같이볼까요 날짜 = {}", memberId, watchMeeting.getDateTime());
 
     return MeetingCancelInfoDto.builder()
-        .movieTitle(newMeeting.getMovie().getTitle())
-        .dateTime(newMeeting.getDateTime())
+        .movieTitle(watchMeeting.getMovie().getTitle())
+        .dateTime(watchMeeting.getDateTime())
         .build();
   }
 }
