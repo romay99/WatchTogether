@@ -36,9 +36,8 @@ public class TransactionHistoryService {
         .build();
 
     // history 저장
-    transactionHistoryRepository.save(history);
+    PointTransactionHistory savedHistory = transactionHistoryRepository.save(history);
     // 사용자의 포인트 업데이트
-    member.setPoint(member.getPoint() + amount);
-    memberRepository.save(member);
+    memberRepository.updateMemberPoint(member.getMemberId(), savedHistory.getAfterTransactionBalance());
   }
 }
