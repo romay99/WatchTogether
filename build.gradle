@@ -38,16 +38,19 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.2'
 
-    //JWT
+    // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    //swagger
+    // swagger
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
 
-    //redis
+    // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // redisson
+    implementation group: 'org.redisson', name: 'redisson', version: '3.2.0'
+
 
 }
 

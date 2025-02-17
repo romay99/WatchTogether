@@ -5,6 +5,8 @@ import com.watchtogether.watchtogether.exception.custom.CinemaNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.DibsNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyExistException;
 import com.watchtogether.watchtogether.exception.custom.MeetingAlreadyRegisterException;
+import com.watchtogether.watchtogether.exception.custom.MeetingCancelNotValidDateException;
+import com.watchtogether.watchtogether.exception.custom.MeetingHistoryNotValidException;
 import com.watchtogether.watchtogether.exception.custom.MeetingMaxPeopleException;
 import com.watchtogether.watchtogether.exception.custom.MeetingNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberIdAlreadyUseException;
@@ -15,6 +17,7 @@ import com.watchtogether.watchtogether.exception.custom.MemberNotFoundException;
 import com.watchtogether.watchtogether.exception.custom.MemberPasswordNotMatchException;
 import com.watchtogether.watchtogether.exception.custom.MovieNotScreenAbleException;
 import com.watchtogether.watchtogether.exception.custom.PartnerCanHaveOneCinemaException;
+import com.watchtogether.watchtogether.exception.custom.RedissonClientLockedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -170,6 +173,40 @@ public class GlobalExceptionHandler {
     ErrorResponse response = new ErrorResponse(e.getMessage());
     return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
   }
+
+  /**
+   * Redisson Lock 획득 실패시 예외처리
+   */
+  @ExceptionHandler(RedissonClientLockedException.class)
+  public ResponseEntity<ErrorResponse> handleRedissonClientLockedException(
+      RedissonClientLockedException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 같이볼까요를 취소할때 취소할 같이볼까요가 존재하지 않을때 예외 처리
+   */
+  @ExceptionHandler(MeetingHistoryNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingHistoryNotValidException(
+      MeetingHistoryNotValidException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * 같이볼까요를 취소할때 취소할 같이볼까요의 날짜가 3일 이내일때 예외처리
+   */
+  @ExceptionHandler(MeetingCancelNotValidDateException.class)
+  public ResponseEntity<ErrorResponse> handleMeetingCancelNotValidDateException(
+      MeetingCancelNotValidDateException e) {
+    ErrorResponse response = new ErrorResponse(e.getMessage());
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
+
+
+
+
 
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {

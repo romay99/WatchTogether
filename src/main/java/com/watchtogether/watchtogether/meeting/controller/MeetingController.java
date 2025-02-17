@@ -1,15 +1,20 @@
 package com.watchtogether.watchtogether.meeting.controller;
 
+import com.watchtogether.watchtogether.history.meeting.dto.MeetingHistoryDto;
+import com.watchtogether.watchtogether.meeting.dto.MeetingCancelInfoDto;
 import com.watchtogether.watchtogether.meeting.dto.MeetingCreateDto;
 import com.watchtogether.watchtogether.meeting.dto.MeetingJoinResponseDto;
 import com.watchtogether.watchtogether.meeting.entity.WatchMeeting;
 import com.watchtogether.watchtogether.meeting.service.MeetingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +43,7 @@ public class MeetingController {
 
   @PostMapping("/join")
   @PreAuthorize("hasRole('ROLE_USER')")
+  @Operation(summary = "같이볼까요 참여", description = "같이볼까요에 참가합니다. 포인트가 15000 포인트 차감됩니다.")
   public ResponseEntity<MeetingJoinResponseDto> joinMeeting(@RequestParam Long meetingId) {
     // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
     String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -46,4 +52,26 @@ public class MeetingController {
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping()
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @Operation(summary = "같이볼까요 조회", description = "본인의 같이볼까요 기록을 조회합니다.")
+  public ResponseEntity<List<MeetingHistoryDto>> meetingHistory(@RequestParam int page, @RequestParam int size) {
+    // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    List<MeetingHistoryDto> result = meetingService.meetinghistory(page, size, memberId);
+    return ResponseEntity.ok().body(result);
+  }
+
+  @DeleteMapping()
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @Operation(summary = "같이볼까요 취소", description = "같이볼까요를 취소합니다. 상영일 기준 3일전까지만 취소 가능합니다."
+      + "(5일 상영예정 -> 3일 00시 부터는 취소불가) 취소된다면 15000 포인트가 환불됩니다.")
+  public ResponseEntity<MeetingCancelInfoDto> cancelMeeting(@RequestParam Long meetingId) {
+    // SecurityContextHolder 에서 인증된 사용자의 ID 를 가져온다.
+    String memberId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    MeetingCancelInfoDto result = meetingService.cancelMeeting(memberId, meetingId);
+    return ResponseEntity.ok(result);
+  }
 }
