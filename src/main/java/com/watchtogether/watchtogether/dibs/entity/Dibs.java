@@ -4,6 +4,7 @@ import com.watchtogether.watchtogether.member.entity.Member;
 import com.watchtogether.watchtogether.movie.entity.Movie;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,7 +35,7 @@ public class Dibs {
   @ManyToOne
   private Movie movie;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
 
   // DB 저장될때 거래 날짜/시간 생성

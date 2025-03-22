@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface DibsRepository extends JpaRepository<Dibs, Long> {
 
+  @Query("SELECT d FROM Dibs d JOIN FETCH d.movie WHERE d.member.memberId = :memberId")
   Page<Dibs> findAllByMemberMemberId(String memberId, Pageable pageable);
 
   @Modifying
@@ -23,4 +24,8 @@ public interface DibsRepository extends JpaRepository<Dibs, Long> {
       "LEFT JOIN Dibs d ON d.member = m AND d.movie = mo " +
       "WHERE m.memberId = :memberId")
   Optional<Tuple> findMovieAndMemberAndCheckDibs(Long movieId, String memberId);
+
+  int countDibsByMovieCode(Long movieCode);
+
+  void deleteDibsByMovieCode(Long movieCode);
 }
