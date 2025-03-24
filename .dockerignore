@@ -1,7 +1,0 @@
-.gradle
-.git
-.idea
-build
-!build/libs/*.jar
-*.md
-*.log
